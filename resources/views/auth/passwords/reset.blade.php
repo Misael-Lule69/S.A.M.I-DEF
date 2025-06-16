@@ -1,65 +1,110 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+<style>
+    body {
+        background: linear-gradient(to right, #dbc9fc, #d3b8f7);
+        font-family: 'Poppins', sans-serif;
+    }
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
+    .reset-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        gap: 30px;
+        flex-wrap: wrap;
+        padding: 20px;
+    }
 
-                        <input type="hidden" name="token" value="{{ $token }}">
+    .reset-box {
+        background: #fff;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+    .reset-box h2 {
+        font-weight: 700;
+        color: #5a189a;
+        margin-bottom: 30px;
+    }
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+    .reset-box input {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+    .reset-box button {
+        width: 100%;
+        background-color: #a270f8;
+        color: white;
+        font-size: 18px;
+        padding: 15px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-weight: 600;
+    }
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+    .reset-box button:hover {
+        background-color: #8e5de2;
+    }
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+    .doctor-image {
+        max-width: 250px;
+    }
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+    .text-danger {
+        font-size: 14px;
+        color: #dc3545;
+    }
 
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
+    @media (max-width: 768px) {
+        .reset-container {
+            flex-direction: column;
+        }
 
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
+        .doctor-image {
+            max-width: 200px;
+        }
+    }
+</style>
 
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="reset-container">
+    <div class="reset-box">
+        <h2>Restablecer contraseña</h2>
+
+        <form method="POST" action="{{ route('password.update') }}">
+            @csrf
+
+            <input type="hidden" name="token" value="{{ $token }}">
+
+            <input id="email" type="email" name="email" value="{{ $email ?? old('email') }}" placeholder="Correo electrónico" required autofocus>
+            @error('email')
+                <span class="text-danger"><strong>{{ $message }}</strong></span>
+            @enderror
+
+            <input id="password" type="password" name="password" placeholder="Nueva contraseña" required>
+            @error('password')
+                <span class="text-danger"><strong>{{ $message }}</strong></span>
+            @enderror
+
+            <input id="password-confirm" type="password" name="password_confirmation" placeholder="Confirmar contraseña" required>
+
+            <button type="submit">Restablecer</button>
+        </form>
+    </div>
+
+    <div>
+        <img src="{{ asset('images/doctor_bot.png') }}" alt="Doctor Bot" class="doctor-image">
     </div>
 </div>
 @endsection
