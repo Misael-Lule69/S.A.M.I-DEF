@@ -6,8 +6,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HorarioController;
 
+
+
 // Rutas de autenticación (desactivando registro)
-Auth::routes(['register' => false]);
+Auth::routes(['register' => true]);
+
+// Ruta raíz - redirige a login o home según autenticación
+Route::redirect('/', '/home');
 
 // Rutas públicas
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -26,7 +31,4 @@ Route::middleware(['auth'])->group(function () {
     
     // Ruta para obtener eventos del calendario (AJAX)
     Route::get('/horarios/eventos', [HorarioController::class, 'getEventos'])->name('horarios.eventos');
-
-    Auth::routes();
 });
-

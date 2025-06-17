@@ -21,6 +21,13 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
     <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        /* Sidebar */
         .sidebar {
             min-height: calc(100vh - 56px);
             background: #2c3e50;
@@ -33,12 +40,16 @@
             transition: all 0.3s;
             z-index: 100;
         }
+        
+        /* Contenido principal */
         .main-content {
             margin-left: 250px;
             padding: 20px;
             width: calc(100% - 250px);
             transition: all 0.3s;
         }
+        
+        /* Logo */
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
@@ -46,60 +57,132 @@
             margin-bottom: 30px;
             color: white;
         }
+        
+        /* Menú de navegación */
         .nav-menu {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+        
         .nav-menu li {
             padding: 12px 20px;
             cursor: pointer;
             transition: all 0.3s;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
+        
         .nav-menu li:hover, 
         .nav-menu li.active {
             background-color: #34495e;
         }
+        
         .nav-menu li a {
             color: white;
             text-decoration: none;
             display: flex;
             align-items: center;
         }
+        
         .nav-menu li a i {
             margin-right: 10px;
             font-size: 1.1rem;
         }
+        
+        /* Páginas de autenticación */
+        .auth-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+        }
+        
+        .auth-card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Estilos responsive */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
+            
             .sidebar.show {
                 transform: translateX(0);
             }
+            
             .main-content {
                 margin-left: 0;
                 width: 100%;
             }
         }
         
-        /* Estilos para el dropdown de usuario */
+        /* Dropdown de usuario */
         .dropdown-menu {
             border: none;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
+        
         .dropdown-item {
             padding: 0.5rem 1.5rem;
         }
+        
         .dropdown-item:hover {
             background-color: #f8f9fa;
             color: #2c3e50;
+        }
+
+        /* Estilo para el botón de registro */
+        .nav-item .btn-primary {
+            margin-left: 10px;
+            padding: 0.375rem 0.75rem;
+        }
+
+        /* Botón de registro flotante */
+        .register-float {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 576px) {
+            .register-float {
+                position: static;
+                margin: 20px auto;
+                display: block;
+                width: fit-content;
+            }
         }
     </style>
 </head>
 <body>
     <div id="app">
+        @unless(Request::is('login') || Request::is('register') || Request::is('password/reset*') || Request::is('password/email'))
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container-fluid">
                 <button class="navbar-toggler d-md-none me-2" type="button" onclick="toggleSidebar()">
@@ -145,28 +228,57 @@
                                 <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary" href="{{ route('register') }}">
+                                <i class="bi bi-person-plus me-1"></i> Registrarse
+                            </a>
+                        </li>
                         @endauth
                     </ul>
                 </div>
             </div>
         </nav>
+        @endunless
 
+        @if(Request::is('login') || Request::is('register') || Request::is('password/reset*') || Request::is('password/email'))
+        <div class="auth-page">
+            @if(Request::is('login'))
+            <div class="register-float">
+                <a href="{{ route('register') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-person-plus me-1"></i> Registrarse
+                </a>
+            </div>
+            @endif
+            
+            <main class="auth-container">
+                @yield('content')
+                
+                @if(Request::is('login') && Route::has('password.request'))
+                <div class="text-center mt-3">
+                    <a class="btn btn-link text-decoration-none" href="{{ route('password.request') }}">
+                        {{ __('Forgot Your Password?') }}
+                    </a>
+                </div>
+                @endif
+            </main>
+        </div>
+        @else
         <div class="d-flex">
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar">
                 <div class="logo">SAMI</div>
                 <ul class="nav-menu">
                     <li class="{{ request()->is('home') ? 'active' : '' }}">
-                        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i>Inicio</a>
+                        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i> Inicio</a>
                     </li>
                     <li class="{{ request()->is('horarios') ? 'active' : '' }}">
-                        <a href="{{ route('horarios') }}"><i class="bi bi-calendar3"></i>Horarios</a>
+                        <a href="{{ route('horarios') }}"><i class="bi bi-calendar3"></i> Horarios</a>
                     </li>
                     <li class="{{ request()->is('citas') ? 'active' : '' }}">
-                        <a href="#"><i class="bi bi-clipboard2-pulse"></i>Citas</a>
+                        <a href="#"><i class="bi bi-clipboard2-pulse"></i> Citas</a>
                     </li>
                     <li class="{{ request()->is('expedientes') ? 'active' : '' }}">
-                        <a href="#"><i class="bi bi-folder"></i>Expedientes</a>
+                        <a href="#"><i class="bi bi-folder"></i> Expedientes</a>
                     </li>
                 </ul>
             </div>
@@ -176,6 +288,7 @@
                 @yield('content')
             </main>
         </div>
+        @endif
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
