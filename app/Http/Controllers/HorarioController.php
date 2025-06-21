@@ -11,6 +11,16 @@ class HorarioController extends Controller
         return view('horarios');
     }
 
+    public function guardar(Request $request)
+{
+    // Aquí puedes hacer lo que necesites con los datos
+    $horarios = $request->all();
+
+    // Por ahora, solo devolver éxito
+    return response()->json(['success' => true]);
+}
+
+
     public function getEventos()
     {
         // Datos de ejemplo - reemplaza con tu lógica real

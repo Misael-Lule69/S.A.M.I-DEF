@@ -31,4 +31,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Ruta para obtener eventos del calendario (AJAX)
     Route::get('/horarios/eventos', [HorarioController::class, 'getEventos'])->name('horarios.eventos');
+
+    Route::post('/guardar-horarios', [App\Http\Controllers\HorarioController::class, 'guardar']);
+
+    Route::post('/guardar-horarios', [HorarioController::class, 'guardar'])->name('guardar.horarios');
+
 });

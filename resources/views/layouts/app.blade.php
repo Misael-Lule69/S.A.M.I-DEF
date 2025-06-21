@@ -20,6 +20,8 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <style>
         /* Estilos generales */
         body {
@@ -256,7 +258,7 @@
                 @if(Request::is('login') && Route::has('password.request'))
                 <div class="text-center mt-3">
                     <a class="btn btn-link text-decoration-none" href="{{ route('password.request') }}">
-                        {{ __('Forgot Your Password?') }}
+                        ¿Olvidaste tu contraseña?
                     </a>
                 </div>
                 @endif
@@ -322,5 +324,6 @@
             });
         });
     </script>
+    @yield('scripts')
 </body>
 </html>
