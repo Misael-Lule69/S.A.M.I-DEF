@@ -20,165 +20,6 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f8f9fa;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            min-height: calc(100vh - 56px);
-            background: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            width: 250px;
-            position: fixed;
-            top: 56px;
-            left: 0;
-            transition: all 0.3s;
-            z-index: 100;
-        }
-        
-        /* Contenido principal */
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            transition: all 0.3s;
-        }
-        
-        /* Logo */
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-        
-        /* Menú de navegación */
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .nav-menu li {
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .nav-menu li:hover, 
-        .nav-menu li.active {
-            background-color: #34495e;
-        }
-        
-        .nav-menu li a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-        
-        .nav-menu li a i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-        
-        /* Páginas de autenticación */
-        .auth-page {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-            position: relative;
-        }
-        
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 2rem;
-        }
-        
-        .auth-card {
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        }
-        
-        .auth-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .auth-footer {
-            text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #eee;
-        }
-        
-        /* Estilos responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-        
-        /* Dropdown de usuario */
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        
-        .dropdown-item {
-            padding: 0.5rem 1.5rem;
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #2c3e50;
-        }
-
-        /* Estilo para el botón de registro */
-        .nav-item .btn-primary {
-            margin-left: 10px;
-            padding: 0.375rem 0.75rem;
-        }
-
-        /* Botón de registro flotante */
-        .register-float {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        
-        @media (max-width: 576px) {
-            .register-float {
-                position: static;
-                margin: 20px auto;
-                display: block;
-                width: fit-content;
-            }
-        }
-    </style>
 </head>
 <body>
     <div id="app">
@@ -244,23 +85,19 @@
         <div class="auth-page">
             @if(Request::is('login'))
             <div class="register-float">
-                <a href="{{ route('register') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-person-plus me-1"></i> Registrarse
-                </a>
+                
             </div>
             @endif
             
-            <main class="auth-container">
+            
                 @yield('content')
                 
                 @if(Request::is('login') && Route::has('password.request'))
                 <div class="text-center mt-3">
-                    <a class="btn btn-link text-decoration-none" href="{{ route('password.request') }}">
-                        {{ __('Forgot Your Password?') }}
-                    </a>
+                    
                 </div>
                 @endif
-            </main>
+            
         </div>
         @else
         <div class="d-flex">
@@ -295,10 +132,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Función para mostrar/ocultar el sidebar en móviles
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('show');
-        }
+        
 
         // Inicializar todos los dropdowns de Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
@@ -321,6 +155,12 @@
                 }
             });
         });
+
+        
     </script>
 </body>
+
+
+
+
 </html>
