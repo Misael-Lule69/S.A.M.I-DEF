@@ -20,86 +20,10 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
-    <style>
-        .sidebar {
-            min-height: calc(100vh - 56px);
-            background: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            width: 250px;
-            position: fixed;
-            top: 56px;
-            left: 0;
-            transition: all 0.3s;
-            z-index: 100;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            transition: all 0.3s;
-        }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .nav-menu li {
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .nav-menu li:hover, 
-        .nav-menu li.active {
-            background-color: #34495e;
-        }
-        .nav-menu li a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-        .nav-menu li a i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-        
-        /* Estilos para el dropdown de usuario */
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        .dropdown-item {
-            padding: 0.5rem 1.5rem;
-        }
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #2c3e50;
-        }
-    </style>
 </head>
 <body>
     <div id="app">
+        @unless(Request::is('login') || Request::is('register') || Request::is('password/reset*') || Request::is('password/email'))
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container-fluid">
                 <button class="navbar-toggler d-md-none me-2" type="button" onclick="toggleSidebar()">
@@ -145,28 +69,53 @@
                                 <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary" href="{{ route('register') }}">
+                                <i class="bi bi-person-plus me-1"></i> Registrarse
+                            </a>
+                        </li>
                         @endauth
                     </ul>
                 </div>
             </div>
         </nav>
+        @endunless
 
+        @if(Request::is('login') || Request::is('register') || Request::is('password/reset*') || Request::is('password/email'))
+        <div class="auth-page">
+            @if(Request::is('login'))
+            <div class="register-float">
+                
+            </div>
+            @endif
+            
+            
+                @yield('content')
+                
+                @if(Request::is('login') && Route::has('password.request'))
+                <div class="text-center mt-3">
+                    
+                </div>
+                @endif
+            
+        </div>
+        @else
         <div class="d-flex">
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar">
                 <div class="logo">SAMI</div>
                 <ul class="nav-menu">
                     <li class="{{ request()->is('home') ? 'active' : '' }}">
-                        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i>Inicio</a>
+                        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i> Inicio</a>
                     </li>
                     <li class="{{ request()->is('horarios') ? 'active' : '' }}">
-                        <a href="{{ route('horarios') }}"><i class="bi bi-calendar3"></i>Horarios</a>
+                        <a href="{{ route('horarios') }}"><i class="bi bi-calendar3"></i> Horarios</a>
                     </li>
                     <li class="{{ request()->is('citas') ? 'active' : '' }}">
-                        <a href="#"><i class="bi bi-clipboard2-pulse"></i>Citas</a>
+                        <a href="#"><i class="bi bi-clipboard2-pulse"></i> Citas</a>
                     </li>
                     <li class="{{ request()->is('expedientes') ? 'active' : '' }}">
-                        <a href="#"><i class="bi bi-folder"></i>Expedientes</a>
+                        <a href="#"><i class="bi bi-folder"></i> Expedientes</a>
                     </li>
                 </ul>
             </div>
@@ -176,16 +125,14 @@
                 @yield('content')
             </main>
         </div>
+        @endif
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Función para mostrar/ocultar el sidebar en móviles
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('show');
-        }
+        
 
         // Inicializar todos los dropdowns de Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
@@ -208,6 +155,12 @@
                 }
             });
         });
+
+        
     </script>
 </body>
+
+
+
+
 </html>
