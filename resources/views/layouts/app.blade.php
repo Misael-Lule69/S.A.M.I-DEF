@@ -20,6 +20,7 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
+<<<<<<< HEAD
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
@@ -181,6 +182,8 @@
             }
         }
     </style>
+=======
+>>>>>>> c7e1f5e26967c21f91291f0f224f2803f7293ab2
 </head>
 <body>
     <div id="app">
@@ -246,23 +249,25 @@
         <div class="auth-page">
             @if(Request::is('login'))
             <div class="register-float">
-                <a href="{{ route('register') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-person-plus me-1"></i> Registrarse
-                </a>
+                
             </div>
             @endif
             
-            <main class="auth-container">
+            
                 @yield('content')
                 
                 @if(Request::is('login') && Route::has('password.request'))
                 <div class="text-center mt-3">
+<<<<<<< HEAD
                     <a class="btn btn-link text-decoration-none" href="{{ route('password.request') }}">
                         ¿Olvidaste tu contraseña?
                     </a>
+=======
+                    
+>>>>>>> c7e1f5e26967c21f91291f0f224f2803f7293ab2
                 </div>
                 @endif
-            </main>
+            
         </div>
         @else
         <div class="d-flex">
@@ -297,10 +302,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Función para mostrar/ocultar el sidebar en móviles
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('show');
-        }
+        
 
         // Inicializar todos los dropdowns de Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
@@ -323,7 +325,13 @@
                 }
             });
         });
+
+        
     </script>
     @yield('scripts')
 </body>
+
+
+
+
 </html>

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <style>
     body {
         background: linear-gradient(to right, #dbc9fc, #d3b8f7);
@@ -110,3 +111,4 @@
     </div>
 </div>
 @endsection
+
