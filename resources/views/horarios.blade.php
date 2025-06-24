@@ -90,6 +90,29 @@
                                     </div>
                                 </div>
 
+                                <!-- Selección de días de descanso -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <h5 class="mb-0">Días de Descanso</h5>
+                                                <p class="mb-0 text-muted">Seleccione los días que desea marcar como descanso completo</p>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="btn-group" role="group">
+                                                    @foreach(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as $day)
+                                                    <input type="checkbox" class="btn-check day-off-checkbox" id="day-off-{{ strtolower($day) }}" autocomplete="off" data-day="{{ strtolower($day) }}">
+                                                    <label class="btn btn-outline-danger" for="day-off-{{ strtolower($day) }}">{{ $day }}</label>
+                                                    @endforeach
+                                                </div>
+                                                <div class="mt-2">
+                                                    <button class="btn btn-sm btn-outline-secondary" id="clear-days-off">Limpiar selección</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Días de la semana -->
                                 <div class="row">
                                     @foreach(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as $day)
@@ -141,7 +164,7 @@
                     </div>
                 </div>
 
-                <!-- Modal para agregar bloques -->
+                <!-- Modal para agregar/editar bloques -->
                 <div class="modal fade" id="blockModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -152,6 +175,7 @@
                             <div class="modal-body">
                                 <form id="block-form">
                                     <input type="hidden" id="block-day">
+                                    <input type="hidden" id="block-id">
                                     <div class="mb-3">
                                         <label class="form-label">Tipo de bloque</label>
                                         <div class="btn-group w-100" role="group">
@@ -258,6 +282,18 @@
         position: absolute;
         right: 10px;
         top: 5px;
+        display: flex;
+        gap: 5px;
+    }
+    
+    .edit-block {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .delete-block {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
     }
     
     .form-switch .form-check-input {
@@ -411,6 +447,18 @@
     .fc-scroller::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
     }
+
+    /* Estilos para días de descanso */
+    .day-off-checkbox:checked + label {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+
+    /* Estilos para el botón de limpiar días de descanso */
+    #clear-days-off {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
 </style>
 @endsection
 
@@ -424,6 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const scheduleData = {};
     const blockModal = new bootstrap.Modal(document.getElementById('blockModal'));
     let calendar; // Variable para el calendario
+    let isEditing = false; // Para saber si estamos editando un bloque
     
     // Inicializar datos para cada día
     document.querySelectorAll('.day-card').forEach(card => {
@@ -561,6 +610,10 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const day = this.dataset.day;
             document.getElementById('block-day').value = day;
+            document.getElementById('block-id').value = '';
+            isEditing = false;
+            document.getElementById('block-form').reset();
+            document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque';
             blockModal.show();
         });
     });
@@ -570,18 +623,28 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('block-type-work').checked = true;
         // No establecemos día específico para estos botones
         document.getElementById('block-day').value = '';
+        document.getElementById('block-id').value = '';
+        isEditing = false;
+        document.getElementById('block-form').reset();
+        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque';
         blockModal.show();
     });
     
     document.getElementById('add-break-block').addEventListener('click', function() {
         document.getElementById('block-type-break').checked = true;
         document.getElementById('block-day').value = '';
+        document.getElementById('block-id').value = '';
+        isEditing = false;
+        document.getElementById('block-form').reset();
+        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque';
         blockModal.show();
     });
     
     // Guardar bloque
     document.getElementById('save-block').addEventListener('click', function() {
         const day = document.getElementById('block-day').value;
+        const blockId = document.getElementById('block-id').value;
+        
         if (!day) {
             alert('Por favor, selecciona un día primero');
             return;
@@ -603,16 +666,40 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Agregar bloque a los datos
+        // Validar que el bloque no se solape con otros bloques existentes
+        if (!isEditing) {
+            const hasOverlap = scheduleData[day].blocks.some(block => {
+                return (startTime >= block.startTime && startTime < block.endTime) ||
+                       (endTime > block.startTime && endTime <= block.endTime) ||
+                       (startTime <= block.startTime && endTime >= block.endTime);
+            });
+            
+            if (hasOverlap) {
+                alert('Este bloque se solapa con otro bloque existente');
+                return;
+            }
+        }
+        
+        // Crear o actualizar bloque
         const block = {
             type,
             startTime,
             endTime,
             label,
-            id: Date.now()
+            id: blockId || Date.now()
         };
         
-        scheduleData[day].blocks.push(block);
+        if (isEditing && blockId) {
+            // Editar bloque existente
+            const index = scheduleData[day].blocks.findIndex(b => b.id == blockId);
+            if (index !== -1) {
+                scheduleData[day].blocks[index] = block;
+            }
+        } else {
+            // Agregar nuevo bloque
+            scheduleData[day].blocks.push(block);
+        }
+        
         updateDayCard(day);
         
         // Resetear formulario y cerrar modal
@@ -692,6 +779,50 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Manejar días de descanso
+    document.querySelectorAll('.day-off-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const day = this.dataset.day;
+            const isDayOff = this.checked;
+            
+            if (isDayOff) {
+                // Marcar como día de descanso completo
+                scheduleData[day].active = true;
+                scheduleData[day].blocks = [
+                    { type: 'break', startTime: '00:00', endTime: '23:59', label: 'Día de descanso', id: Date.now() }
+                ];
+                document.getElementById(`toggle-${day}`).checked = true;
+            } else {
+                // Quitar día de descanso
+                scheduleData[day].blocks = [];
+                document.getElementById(`toggle-${day}`).checked = false;
+                scheduleData[day].active = false;
+            }
+            
+            updateDayCard(day);
+            updateGlobalStats();
+        });
+    });
+    
+    // Limpiar selección de días de descanso
+    document.getElementById('clear-days-off').addEventListener('click', function() {
+        document.querySelectorAll('.day-off-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+            const day = checkbox.dataset.day;
+            
+            // Solo limpiar si el día solo tenía el bloque de descanso completo
+            if (scheduleData[day].blocks.length === 1 && 
+                scheduleData[day].blocks[0].label === 'Día de descanso') {
+                scheduleData[day].blocks = [];
+                document.getElementById(`toggle-${day}`).checked = false;
+                scheduleData[day].active = false;
+                updateDayCard(day);
+            }
+        });
+        
+        updateGlobalStats();
+    });
+    
     // Eliminar bloque
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('delete-block') || e.target.closest('.delete-block')) {
@@ -703,6 +834,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (index !== -1) {
                     scheduleData[day].blocks.splice(index, 1);
                     updateDayCard(day);
+                    break;
+                }
+            }
+        }
+        
+        // Editar bloque
+        if (e.target.classList.contains('edit-block') || e.target.closest('.edit-block')) {
+            const button = e.target.classList.contains('edit-block') ? e.target : e.target.closest('.edit-block');
+            const blockId = parseInt(button.dataset.id);
+            
+            for (const day in scheduleData) {
+                const block = scheduleData[day].blocks.find(b => b.id === blockId);
+                if (block) {
+                    // Llenar el modal con los datos del bloque
+                    document.getElementById('block-day').value = day;
+                    document.getElementById('block-id').value = block.id;
+                    document.getElementById(`block-type-${block.type}`).checked = true;
+                    document.getElementById('start-time').value = block.startTime;
+                    document.getElementById('end-time').value = block.endTime;
+                    document.getElementById('block-label').value = block.label;
+                    
+                    isEditing = true;
+                    document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Editar Bloque';
+                    blockModal.show();
                     break;
                 }
             }
@@ -748,8 +903,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="block-label">${block.label}</div>
                     <div class="block-actions">
+                        <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">
+                            Editar
+                        </button>
                         <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">
-                            <i class="fas fa-trash"></i>
+                            Eliminar
                         </button>
                     </div>
                 `;
@@ -762,6 +920,14 @@ document.addEventListener('DOMContentLoaded', function() {
         updateGlobalStats();
         // Actualizar calendario
         updateCalendar();
+        
+        // Actualizar checkboxes de días de descanso
+        const dayOffCheckbox = document.querySelector(`.day-off-checkbox[data-day="${day}"]`);
+        if (dayData.blocks.length === 1 && dayData.blocks[0].label === 'Día de descanso') {
+            dayOffCheckbox.checked = true;
+        } else {
+            dayOffCheckbox.checked = false;
+        }
     }
     
     // Guardar horario
