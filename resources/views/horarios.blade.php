@@ -85,6 +85,7 @@
                                             <option value="full-day">Jornada Completa</option>
                                             <option value="morning">Solo Mañana</option>
                                             <option value="afternoon">Solo Tarde</option>
+                                            <option value="pientiles">Pientiles</option>
                                         </select>
                                     </div>
                                 </div>
@@ -277,23 +278,23 @@
         font-weight: 500;
     }
     
-.block-actions {
-    position: absolute;
-    right: 10px;
-    top: 5px;
-    display: flex;
-    gap: 5px;
-}
-
-.edit-block {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-}
-
-.delete-block {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-}
+    .block-actions {
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        display: flex;
+        gap: 5px;
+    }
+    
+    .edit-block {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .delete-block {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
     
     .form-switch .form-check-input {
         width: 2.5em;
@@ -665,6 +666,20 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Validar que el bloque no se solape con otros bloques existentes
+        if (!isEditing) {
+            const hasOverlap = scheduleData[day].blocks.some(block => {
+                return (startTime >= block.startTime && startTime < block.endTime) ||
+                       (endTime > block.startTime && endTime <= block.endTime) ||
+                       (startTime <= block.startTime && endTime >= block.endTime);
+            });
+            
+            if (hasOverlap) {
+                alert('Este bloque se solapa con otro bloque existente');
+                return;
+            }
+        }
+        
         // Crear o actualizar bloque
         const block = {
             type,
@@ -726,6 +741,15 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'afternoon':
                 dayData.blocks = [
                     { type: 'work', startTime: '14:00', endTime: '18:00', label: 'Tarde', id: Date.now() + 1 }
+                ];
+                break;
+            case 'pientiles':
+                dayData.blocks = [
+                    { type: 'work', startTime: '08:00', endTime: '11:00', label: 'Turno 1', id: Date.now() + 1 },
+                    { type: 'break', startTime: '11:00', endTime: '12:00', label: 'Descanso', id: Date.now() + 2 },
+                    { type: 'work', startTime: '12:00', endTime: '15:00', label: 'Turno 2', id: Date.now() + 3 },
+                    { type: 'break', startTime: '15:00', endTime: '16:00', label: 'Descanso', id: Date.now() + 4 },
+                    { type: 'work', startTime: '16:00', endTime: '19:00', label: 'Turno 3', id: Date.now() + 5 }
                 ];
                 break;
         }
@@ -879,13 +903,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="block-label">${block.label}</div>
                     <div class="block-actions">
-    <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">
-        Editar
-    </button>
-    <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">
-        Eliminar
-    </button>
-</div>
+                        <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">
+                            Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">
+                            Eliminar
+                        </button>
+                    </div>
                 `;
                 
                 timelineItems.appendChild(timelineItem);
