@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <!-- Contenido Principal -->
     <div class="col-md-12">
         <div class="card border-0">
             <div class="card-header bg-white border-0">
@@ -15,9 +14,6 @@
                 <ul class="nav nav-tabs mb-4" id="scheduleTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="blocks-tab" data-bs-toggle="tab" data-bs-target="#blocks-tab-pane" type="button" role="tab">Configuración de Bloques</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar-tab-pane" type="button" role="tab">Vista de Calendario</button>
                     </li>
                 </ul>
 
@@ -173,8 +169,20 @@
                             </div>
                             <div class="modal-body">
                                 <form id="block-form">
-                                    <input type="hidden" id="block-day">
                                     <input type="hidden" id="block-id">
+                                    <div class="mb-3">
+                                        <label class="form-label">Día de la semana</label>
+                                        <select class="form-select" id="block-day" required>
+                                            <option value="">Seleccionar día...</option>
+                                            <option value="lunes">Lunes</option>
+                                            <option value="martes">Martes</option>
+                                            <option value="miércoles">Miércoles</option>
+                                            <option value="jueves">Jueves</option>
+                                            <option value="viernes">Viernes</option>
+                                            <option value="sábado">Sábado</option>
+                                            <option value="domingo">Domingo</option>
+                                        </select>
+                                    </div>
                                     <div class="mb-3">
                                         <label class="form-label">Tipo de bloque</label>
                                         <div class="btn-group w-100" role="group">
@@ -211,6 +219,39 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Modal para agregar descanso -->
+                <div class="modal fade" id="restDayModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Agregar Día de Descanso</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="rest-day-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Seleccionar día(s)</label>
+                                        <div class="btn-group-vertical w-100" role="group">
+                                            @foreach(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as $day)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="rest-day-{{ strtolower($day) }}" value="{{ strtolower($day) }}">
+                                                <label class="form-check-label" for="rest-day-{{ strtolower($day) }}">
+                                                    {{ $day }}
+                                                </label>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" id="save-rest-day">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -221,12 +262,6 @@
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-    /* Estilos esenciales */
-    html, body {
-        height: 100%;
-    }
-    
-    /* Estilos para las tarjetas de días */
     .day-card {
         transition: all 0.3s ease;
     }
@@ -289,7 +324,6 @@
         margin-right: 10px;
     }
 
-    /* Estilos para pestañas */
     .nav-tabs .nav-link {
         font-weight: 500;
         color: #495057;
@@ -300,7 +334,6 @@
         color: #0d6efd;
     }
 
-    /* Estilos mejorados para el calendario */
     #calendar {
         width: 100%;
         min-height: 70vh;
@@ -310,7 +343,6 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
-    /* Cabecera del calendario */
     .fc-header-toolbar {
         margin-bottom: 1em;
         padding: 10px;
@@ -324,7 +356,6 @@
         color: #343a40;
     }
 
-    /* Botones del calendario */
     .fc-button {
         background-color: #f8f9fa;
         border: 1px solid #dee2e6;
@@ -345,7 +376,6 @@
         color: white;
     }
 
-    /* Días de la semana */
     .fc-col-header-cell {
         background-color: #f8f9fa;
         padding: 10px 0;
@@ -358,7 +388,6 @@
         text-decoration: none;
     }
 
-    /* Celdas del calendario */
     .fc-timegrid-slot {
         height: 2.5em;
         border-color: #f1f3f5 !important;
@@ -369,7 +398,6 @@
         font-size: 0.85em;
     }
 
-    /* Eventos del calendario */
     .fc-event {
         border: none;
         border-radius: 4px;
@@ -410,13 +438,11 @@
         opacity: 0.9;
     }
 
-    /* Hora actual */
     .fc-timegrid-now-indicator-line {
         border-color: #dc3545;
         border-width: 2px;
     }
 
-    /* Scrollbar del calendario */
     .fc-scroller::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -435,13 +461,11 @@
         background: #a8a8a8;
     }
 
-    /* Estilos para días de descanso */
     .day-off-checkbox:checked + label {
         background-color: #dc3545 !important;
         color: white !important;
     }
 
-    /* Estilos para el botón de limpiar días de descanso */
     #clear-days-off {
         padding: 0.25rem 0.5rem;
         font-size: 0.8rem;
@@ -455,20 +479,59 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Variables globales
-    const scheduleData = {};
-    const blockModal = new bootstrap.Modal(document.getElementById('blockModal'));
-    let calendar; // Variable para el calendario
-    let isEditing = false; // Para saber si estamos editando un bloque
+    // Variables globales necesarias
+    let scheduleData = {
+        'lunes': { active: false, blocks: [] },
+        'martes': { active: false, blocks: [] },
+        'miércoles': { active: false, blocks: [] },
+        'jueves': { active: false, blocks: [] },
+        'viernes': { active: false, blocks: [] },
+        'sábado': { active: false, blocks: [] },
+        'domingo': { active: false, blocks: [] }
+    };
     
-    // Inicializar datos para cada día
-    document.querySelectorAll('.day-card').forEach(card => {
-        const day = card.dataset.day;
-        scheduleData[day] = {
-            active: false,
-            blocks: []
-        };
-    });
+    let calendar = null;
+    let isEditing = false;
+    const blockModal = new bootstrap.Modal(document.getElementById('blockModal'));
+    const restDayModal = new bootstrap.Modal(document.getElementById('restDayModal'));
+    
+    // Cargar horarios automáticamente al iniciar
+    loadSchedules();
+
+    // Función mejorada para cargar horarios
+    function loadSchedules() {
+        fetch("{{ route('horarios.eventos') }}")
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la respuesta');
+                return response.json();
+            })
+            .then(data => {
+                // Reiniciar los datos
+                Object.keys(scheduleData).forEach(day => {
+                    scheduleData[day].active = false;
+                    scheduleData[day].blocks = [];
+                });
+
+                // Cargar datos del servidor
+                for (const day in data) {
+                    if (scheduleData[day]) {
+                        scheduleData[day].active = data[day].active;
+                        scheduleData[day].blocks = data[day].blocks || [];
+                        
+                        // Actualizar UI
+                        const toggle = document.getElementById(`toggle-${day}`);
+                        if (toggle) {
+                            toggle.checked = data[day].active;
+                        }
+                        updateDayCard(day);
+                    }
+                }
+                updateGlobalStats();
+            })
+            .catch(error => {
+                console.error("Error al cargar horarios:", error);
+            });
+    }
     
     // Inicializar FullCalendar
     function initCalendar() {
@@ -537,9 +600,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (scheduleData[day].active && scheduleData[day].blocks.length > 0) {
                 scheduleData[day].blocks.forEach(block => {
                     events.push({
-                        title: block.label,
-                        startTime: block.startTime,
-                        endTime: block.endTime,
+                        title: block.label || (block.type === 'work' ? 'Trabajo' : 'Descanso'),
+                        startTime: block.startTime || block.start,
+                        endTime: block.endTime || block.end,
                         daysOfWeek: [daysMap[day]],
                         type: block.type,
                         backgroundColor: block.type === 'work' ? '#0d6efd' : '#6c757d',
@@ -577,10 +640,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Calcular horas totales
             scheduleData[day].blocks.forEach(block => {
-                const start = new Date(`2000-01-01T${block.startTime}:00`);
-                const end = new Date(`2000-01-01T${block.endTime}:00`);
-                const diff = (end - start) / (1000 * 60); // diferencia en minutos
-                totalMinutes += diff;
+                const start = block.startTime || block.start;
+                const end = block.endTime || block.end;
+                
+                if (start && end) {
+                    const startTime = new Date(`2000-01-01T${start}:00`);
+                    const endTime = new Date(`2000-01-01T${end}:00`);
+                    const diff = (endTime - startTime) / (1000 * 60); // diferencia en minutos
+                    totalMinutes += diff;
+                }
             });
         }
         
@@ -600,6 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('block-id').value = '';
             isEditing = false;
             document.getElementById('block-form').reset();
+            document.getElementById('block-type-work').checked = true;
             document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque';
             blockModal.show();
         });
@@ -608,22 +677,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botones superiores para agregar bloques
     document.getElementById('add-work-block').addEventListener('click', function() {
         document.getElementById('block-type-work').checked = true;
-        // No establecemos día específico para estos botones
-        document.getElementById('block-day').value = '';
         document.getElementById('block-id').value = '';
         isEditing = false;
         document.getElementById('block-form').reset();
-        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque';
+        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque de Trabajo';
         blockModal.show();
     });
     
     document.getElementById('add-break-block').addEventListener('click', function() {
         document.getElementById('block-type-break').checked = true;
-        document.getElementById('block-day').value = '';
         document.getElementById('block-id').value = '';
         isEditing = false;
         document.getElementById('block-form').reset();
-        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque';
+        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque de Descanso';
         blockModal.show();
     });
     
@@ -656,10 +722,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Crear o actualizar bloque
         const block = {
             type,
-            startTime,
-            endTime,
+            startTime: startTime,
+            endTime: endTime,
+            start: startTime, // Compatibilidad con backend
+            end: endTime,      // Compatibilidad con backend
             label,
-            id: blockId || Date.now()
+            id: blockId || Date.now().toString()
         };
         
         if (isEditing && blockId) {
@@ -671,6 +739,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Agregar nuevo bloque
             scheduleData[day].blocks.push(block);
+        }
+        
+        // Activar el día si no estaba activo
+        if (!scheduleData[day].active) {
+            scheduleData[day].active = true;
+            document.getElementById(`toggle-${day}`).checked = true;
         }
         
         updateDayCard(day);
@@ -701,19 +775,19 @@ document.addEventListener('DOMContentLoaded', function() {
         switch(template) {
             case 'full-day':
                 dayData.blocks = [
-                    { type: 'work', startTime: '09:00', endTime: '13:00', label: 'Mañana', id: Date.now() + 1 },
-                    { type: 'break', startTime: '13:00', endTime: '14:00', label: 'Almuerzo', id: Date.now() + 2 },
-                    { type: 'work', startTime: '14:00', endTime: '18:00', label: 'Tarde', id: Date.now() + 3 }
+                    { type: 'work', startTime: '09:00', start: '09:00', endTime: '13:00', end: '13:00', label: 'Mañana', id: Date.now().toString() + 1 },
+                    { type: 'break', startTime: '13:00', start: '13:00', endTime: '14:00', end: '14:00', label: 'Almuerzo', id: Date.now().toString() + 2 },
+                    { type: 'work', startTime: '14:00', start: '14:00', endTime: '18:00', end: '18:00', label: 'Tarde', id: Date.now().toString() + 3 }
                 ];
                 break;
             case 'morning':
                 dayData.blocks = [
-                    { type: 'work', startTime: '09:00', endTime: '13:00', label: 'Mañana', id: Date.now() + 1 }
+                    { type: 'work', startTime: '09:00', start: '09:00', endTime: '13:00', end: '13:00', label: 'Mañana', id: Date.now().toString() + 1 }
                 ];
                 break;
             case 'afternoon':
                 dayData.blocks = [
-                    { type: 'work', startTime: '14:00', endTime: '18:00', label: 'Tarde', id: Date.now() + 1 }
+                    { type: 'work', startTime: '14:00', start: '14:00', endTime: '18:00', end: '18:00', label: 'Tarde', id: Date.now().toString() + 1 }
                 ];
                 break;
         }
@@ -753,7 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Marcar como día de descanso completo
                 scheduleData[day].active = true;
                 scheduleData[day].blocks = [
-                    { type: 'break', startTime: '00:00', endTime: '23:59', label: 'Día de descanso', id: Date.now() }
+                    { type: 'break', startTime: '00:00', start: '00:00', endTime: '23:59', end: '23:59', label: 'Día de descanso', id: Date.now().toString() }
                 ];
                 document.getElementById(`toggle-${day}`).checked = true;
             } else {
@@ -791,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('delete-block') || e.target.closest('.delete-block')) {
             const button = e.target.classList.contains('delete-block') ? e.target : e.target.closest('.delete-block');
-            const blockId = parseInt(button.dataset.id);
+            const blockId = button.dataset.id;
             
             for (const day in scheduleData) {
                 const index = scheduleData[day].blocks.findIndex(b => b.id === blockId);
@@ -806,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Editar bloque
         if (e.target.classList.contains('edit-block') || e.target.closest('.edit-block')) {
             const button = e.target.classList.contains('edit-block') ? e.target : e.target.closest('.edit-block');
-            const blockId = parseInt(button.dataset.id);
+            const blockId = button.dataset.id;
             
             for (const day in scheduleData) {
                 const block = scheduleData[day].blocks.find(b => b.id === blockId);
@@ -815,8 +889,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('block-day').value = day;
                     document.getElementById('block-id').value = block.id;
                     document.getElementById(`block-type-${block.type}`).checked = true;
-                    document.getElementById('start-time').value = block.startTime;
-                    document.getElementById('end-time').value = block.endTime;
+                    document.getElementById('start-time').value = block.startTime || block.start;
+                    document.getElementById('end-time').value = block.endTime || block.end;
                     document.getElementById('block-label').value = block.label;
                     
                     isEditing = true;
@@ -832,48 +906,62 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateDayCard(day) {
         const dayData = scheduleData[day];
         const dayCard = document.querySelector(`.day-card[data-day="${day}"]`);
+        
+        if (!dayCard) return;
+        
         const noBlocksMsg = dayCard.querySelector('.no-blocks-message');
         const timelineContainer = dayCard.querySelector('.timeline-container');
         const timelineItems = dayCard.querySelector('.timeline-items');
         const dayStats = dayCard.querySelector('.day-stats');
         
         // Actualizar estadísticas del día
-        dayStats.textContent = `${dayData.blocks.length} ${dayData.blocks.length === 1 ? 'bloque' : 'bloques'}`;
+        if (dayStats) {
+            dayStats.textContent = `${dayData.blocks.length} ${dayData.blocks.length === 1 ? 'bloque' : 'bloques'}`;
+        }
         
         // Mostrar u ocultar mensaje de no bloques
         if (dayData.blocks.length === 0) {
-            noBlocksMsg.classList.remove('d-none');
-            timelineContainer.classList.add('d-none');
+            noBlocksMsg?.classList.remove('d-none');
+            timelineContainer?.classList.add('d-none');
         } else {
-            noBlocksMsg.classList.add('d-none');
-            timelineContainer.classList.remove('d-none');
+            noBlocksMsg?.classList.add('d-none');
+            timelineContainer?.classList.remove('d-none');
             
             // Ordenar bloques por hora de inicio
-            dayData.blocks.sort((a, b) => a.startTime.localeCompare(b.startTime));
+            dayData.blocks.sort((a, b) => {
+                const aTime = a.startTime || a.start;
+                const bTime = b.startTime || b.start;
+                return aTime.localeCompare(bTime);
+            });
             
             // Generar timeline
-            timelineItems.innerHTML = '';
-            dayData.blocks.forEach(block => {
-                const timelineItem = document.createElement('div');
-                timelineItem.className = `timeline-item ${block.type} position-relative`;
-                timelineItem.dataset.id = block.id;
-                
-                timelineItem.innerHTML = `
-                    <div class="d-flex justify-content-between">
-                        <span class="block-time">${block.startTime} - ${block.endTime}</span>
-                        <span class="badge ${block.type === 'work' ? 'bg-primary' : 'bg-secondary'}">
-                            ${block.type === 'work' ? 'Trabajo' : 'Descanso'}
-                        </span>
-                    </div>
-                    <div class="block-label">${block.label}</div>
-                    <div class="block-actions">
-                   <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">Editar</button>
-    <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">Eliminar</button>
-</div>
-                `;
-                
-                timelineItems.appendChild(timelineItem);
-            });
+            if (timelineItems) {
+                timelineItems.innerHTML = '';
+                dayData.blocks.forEach(block => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = `timeline-item ${block.type} position-relative`;
+                    timelineItem.dataset.id = block.id;
+                    
+                    const startTime = block.startTime || block.start;
+                    const endTime = block.endTime || block.end;
+                    
+                    timelineItem.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <span class="block-time">${startTime} - ${endTime}</span>
+                            <span class="badge ${block.type === 'work' ? 'bg-primary' : 'bg-secondary'}">
+                                ${block.type === 'work' ? 'Trabajo' : 'Descanso'}
+                            </span>
+                        </div>
+                        <div class="block-label">${block.label || (block.type === 'work' ? 'Trabajo' : 'Descanso')}</div>
+                        <div class="block-actions">
+                            <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">Editar</button>
+                            <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">Eliminar</button>
+                        </div>
+                    `;
+                    
+                    timelineItems.appendChild(timelineItem);
+                });
+            }
         }
         
         // Actualizar estadísticas globales
@@ -884,40 +972,55 @@ document.addEventListener('DOMContentLoaded', function() {
         // Actualizar checkboxes de días de descanso
         const dayOffCheckbox = document.querySelector(`.day-off-checkbox[data-day="${day}"]`);
         if (dayData.blocks.length === 1 && dayData.blocks[0].label === 'Día de descanso') {
-            dayOffCheckbox.checked = true;
+            if (dayOffCheckbox) dayOffCheckbox.checked = true;
         } else {
-            dayOffCheckbox.checked = false;
+            if (dayOffCheckbox) dayOffCheckbox.checked = false;
         }
     }
     
     // Guardar horario
-    document.getElementById('save-schedule').addEventListener('click', function () {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    document.getElementById('save-schedule').addEventListener('click', function() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        // Prepara los datos para enviar
+        const dataToSend = {};
+        for (const day in scheduleData) {
+            dataToSend[day] = {
+                active: scheduleData[day].active,
+                blocks: scheduleData[day].blocks.map(block => ({
+                    type: block.type,
+                    start: block.startTime || block.start,
+                    end: block.endTime || block.end,
+                    label: block.label
+                }))
+            };
+        }
 
-        fetch('/guardar-horarios', {
+        fetch("{{ route('horarios.guardar') }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
             },
-            body: JSON.stringify(scheduleData)
+            body: JSON.stringify(dataToSend)
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
             return response.json();
         })
         .then(data => {
             if (data.success) {
-                alert('Horarios guardados correctamente.');
+                alert('Horarios guardados correctamente');
+                // Recargar los datos después de guardar
+                loadSchedules();
             } else {
-                alert('No se pudo guardar. Revisa el servidor.');
+                alert('Error al guardar: ' + (data.message || 'Error desconocido'));
             }
         })
         .catch(error => {
-            console.error('Error al guardar:', error);
-            alert('Error al guardar los horarios.');
+            console.error('Error:', error);
+            alert('Error al conectar con el servidor');
         });
     });
 
@@ -928,8 +1031,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Inicializar estadísticas
-    updateGlobalStats();
+    // Inicializar tooltips de Bootstrap
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 });
 </script>
 @endsection
