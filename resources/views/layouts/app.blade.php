@@ -1,4 +1,4 @@
-<!doctype html>
+ <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -20,229 +20,297 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     
-<<<<<<< HEAD
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+<style>
+    /* Estilos generales del sidebar */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #6C5CE7;
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 60px;
+    transition: all 0.3s;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
 
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #f8f9fa;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            min-height: calc(100vh - 56px);
-            background: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            width: 250px;
-            position: fixed;
-            top: 56px;
-            left: 0;
-            transition: all 0.3s;
-            z-index: 100;
-        }
-        
-        /* Contenido principal */
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            transition: all 0.3s;
-        }
-        
-        /* Logo */
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-        
-        /* Menú de navegación */
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .nav-menu li {
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .nav-menu li:hover, 
-        .nav-menu li.active {
-            background-color: #34495e;
-        }
-        
-        .nav-menu li a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-        
-        .nav-menu li a i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-        
-        /* Páginas de autenticación */
-        .auth-page {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-            position: relative;
-        }
-        
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 2rem;
-        }
-        
-        .auth-card {
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        }
-        
-        .auth-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .auth-footer {
-            text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #eee;
-        }
-        
-        /* Estilos responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-        
-        /* Dropdown de usuario */
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        
-        .dropdown-item {
-            padding: 0.5rem 1.5rem;
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #2c3e50;
-        }
+.logo {
+    padding: 15px 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-        /* Estilo para el botón de registro */
-        .nav-item .btn-primary {
-            margin-left: 10px;
-            padding: 0.375rem 0.75rem;
-        }
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
 
-        /* Botón de registro flotante */
-        .register-float {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        
-        @media (max-width: 576px) {
-            .register-float {
-                position: static;
-                margin: 20px auto;
-                display: block;
-                width: fit-content;
-            }
-        }
-    </style>
-=======
->>>>>>> c7e1f5e26967c21f91291f0f224f2803f7293ab2
+.nav-menu li {
+    margin: 0;
+}
+
+.nav-menu li a {
+    display: block;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+}
+
+.nav-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #A29BFE;
+}
+
+.nav-menu li a i {
+    margin-right: 10px;
+}
+
+.nav-menu li.active a {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left: 4px solid #A29BFE;
+}
+
+/* Estilos para el menú de usuario en el sidebar */
+.sidebar-user {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+}
+
+.sidebar-user .user-info {
+    display: flex;
+    align-items: center;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.sidebar-user .user-info i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.sidebar-user .user-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-user .user-menu li {
+    margin: 5px 0;
+}
+
+.sidebar-user .user-menu a {
+    display: block;
+    padding: 8px 10px;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.sidebar-user .user-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user .user-menu .divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 8px 0;
+}
+
+/* Estilos para el contenido principal */
+.main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+/* ===== NUEVOS ESTILOS OPTIMIZADOS PARA EL NAVBAR ===== */
+.navbar {
+    padding: 0.5rem 1rem;
+    min-height: 60px;
+    position: relative;
+    z-index: 1001;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.navbar-brand-container {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding: 0 15px;
+    z-index: 1002;
+    position: relative;
+    text-decoration: none;
+}
+
+.navbar-logo-img {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #6C5CE7;
+    display: block;
+    flex-shrink: 0;
+}
+
+.navbar-brand-text {
+    font-weight: bold;
+    color: #6C5CE7;
+    font-size: 1.25rem;
+    white-space: nowrap;
+    margin: 0;
+    line-height: 1;
+}
+
+.navbar-nav-container {
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+}
+
+/* Botón de hamburguesa */
+.navbar-toggler {
+    border: none;
+    font-size: 1.25rem;
+    padding: 0.5rem;
+    background: transparent;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+/* Estilos para móviles */
+@media (max-width: 767.98px) {
+    .sidebar {
+        left: -250px;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .navbar-brand-container {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .navbar-toggler {
+        order: -1;
+        margin-right: auto;
+    }
+    
+    .navbar-nav-container {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* Estilos para desktop */
+@media (min-width: 768px) {
+    .navbar-brand-container {
+        margin-left: 0;
+        padding-left: 0;
+    }
+    
+    .navbar-logo-img {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+    }
+}
+
+/* Overlay para móviles cuando el sidebar está abierto */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.sidebar.show + .sidebar-overlay {
+    display: block;
+}
+
+/* Garantizar que no haya conflicto con Bootstrap */
+.navbar-collapse {
+    flex-grow: 0 !important;
+}
+</style>
+
+    @stack('styles') <!-- ✅ esto permite que las vistas inyecten sus estilos -->
 </head>
 <body>
     <div id="app">
         @unless(Request::is('login') || Request::is('register') || Request::is('password/reset*') || Request::is('password/email'))
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container-fluid">
-                <button class="navbar-toggler d-md-none me-2" type="button" onclick="toggleSidebar()">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <a class="navbar-brand" href="{{ url('/home') }}">
-                    <strong>SAMI</strong>
-                </a>
+        <nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container-fluid navbar-container">
+        <!-- Botón hamburguesa solo para móvil -->
+        <button class="navbar-toggler d-md-none" type="button" onclick="toggleSidebar()">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Logo y texto - siempre visible -->
+        <a href="{{ url('/home') }}" class="navbar-brand-container">
+            <img src="{{ asset('images/logo1.png') }}" alt="Logo SAMI" class="navbar-logo-img">
+            <span class="navbar-brand-text">SAMI</span>
+        </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" 
-                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i>
-                                {{ Auth::user()->name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bi bi-person me-2"></i> Perfil
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                        @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary" href="{{ route('register') }}">
-                                <i class="bi bi-person-plus me-1"></i> Registrarse
-                            </a>
-                        </li>
-                        @endauth
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <!-- Menú de navegación derecho -->
+        <div class="navbar-nav-container">
+            <ul class="navbar-nav">
+                @guest
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="btn btn-primary" href="{{ route('register') }}">
+                        <i class="bi bi-person-plus me-1"></i> Registrarse
+                    </a>
+                </li>
+                @endguest
+            </ul>
+        </div>
+    </div>
+</nav>
+        
         @endunless
 
         @if(Request::is('login') || Request::is('register') || Request::is('password/reset*') || Request::is('password/email'))
@@ -253,21 +321,15 @@
             </div>
             @endif
             
-            
+            <main class="auth-container">
                 @yield('content')
                 
                 @if(Request::is('login') && Route::has('password.request'))
                 <div class="text-center mt-3">
-<<<<<<< HEAD
-                    <a class="btn btn-link text-decoration-none" href="{{ route('password.request') }}">
-                        ¿Olvidaste tu contraseña?
-                    </a>
-=======
                     
->>>>>>> c7e1f5e26967c21f91291f0f224f2803f7293ab2
                 </div>
                 @endif
-            
+            </main>
         </div>
         @else
         <div class="d-flex">
@@ -288,7 +350,35 @@
                         <a href="#"><i class="bi bi-folder"></i> Expedientes</a>
                     </li>
                 </ul>
+
+                @auth
+                <div class="sidebar-user">
+                    <div class="user-info">
+                        <i class="bi bi-person-circle"></i>
+                        {{ Auth::user()->name }}
+                    </div>
+                    <ul class="user-menu">
+                        <li>
+                            <a href="#">
+                                <i class="bi bi-person me-2"></i> Perfil
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-link text-white p-0 text-start w-100">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                @endauth
             </div>
+
+            <!-- Overlay para móviles -->
+            <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
             <!-- Main Content -->
             <main class="main-content py-4">
@@ -302,7 +392,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        
+        // Función para mostrar/ocultar el sidebar en móviles
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+            
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('show')) {
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Previene el scroll del body
+            } else {
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Restaura el scroll del body
+            }
+        }
+
+        // Cerrar sidebar al hacer clic en un enlace (solo en móviles)
+        document.querySelectorAll('.nav-menu a, .sidebar-user a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+            });
+        });
 
         // Inicializar todos los dropdowns de Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
@@ -325,13 +437,7 @@
                 }
             });
         });
-
-        
     </script>
     @yield('scripts')
 </body>
-
-
-
-
 </html>

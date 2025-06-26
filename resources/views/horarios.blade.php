@@ -94,12 +94,12 @@
                                                 <p class="mb-0 text-muted">Seleccione los días que desea marcar como descanso completo</p>
                                             </div>
                                             <div class="card-body">
-                                                <div class="btn-group" role="group">
-                                                    @foreach(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as $day)
-                                                    <input type="checkbox" class="btn-check day-off-checkbox" id="day-off-{{ strtolower($day) }}" autocomplete="off" data-day="{{ strtolower($day) }}">
-                                                    <label class="btn btn-outline-danger" for="day-off-{{ strtolower($day) }}">{{ $day }}</label>
-                                                    @endforeach
-                                                </div>
+                                                <div class="days-off-container" role="group">
+    @foreach(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as $day)
+    <input type="checkbox" class="btn-check day-off-checkbox" id="day-off-{{ strtolower($day) }}" autocomplete="off" data-day="{{ strtolower($day) }}">
+    <label class="btn btn-outline-danger" for="day-off-{{ strtolower($day) }}">{{ $day }}</label>
+    @endforeach
+</div>
                                                 <div class="mt-2">
                                                     <button class="btn btn-sm btn-outline-secondary" id="clear-days-off">Limpiar selección</button>
                                                 </div>
@@ -470,6 +470,41 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.8rem;
     }
+
+    /* Estilos responsivos para los botones de días de descanso */
+.days-off-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.days-off-container .btn {
+    flex: 1 0 calc(14.28% - 5px); /* 7 botones por fila */
+    min-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 992px) {
+    .days-off-container .btn {
+        flex: 1 0 calc(25% - 5px); /* 4 botones por fila */
+    }
+}
+
+@media (max-width: 768px) {
+    .days-off-container .btn {
+        flex: 1 0 calc(33.33% - 5px); /* 3 botones por fila */
+    }
+}
+
+@media (max-width: 576px) {
+    .days-off-container .btn {
+        flex: 1 0 calc(50% - 5px); /* 2 botones por fila */
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
 </style>
 @endsection
 
