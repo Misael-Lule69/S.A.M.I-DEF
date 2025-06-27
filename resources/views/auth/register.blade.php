@@ -23,7 +23,7 @@
         padding: 40px;
         box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 450px;
+        max-width: 700px;
         text-align: center;
     }
 
@@ -59,12 +59,32 @@
     }
 
     .doctor-image {
-        max-width: 250px;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .text-danger {
         font-size: 14px;
         color: #dc3545;
+    }
+
+    .password-container {
+        position: relative;
+    }
+
+    .password-container input {
+        padding-right: 40px;
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #a270f8;
     }
 
     @media (max-width: 768px) {
@@ -73,7 +93,8 @@
         }
 
         .doctor-image {
-            max-width: 200px;
+            width: 200px;
+            height: 200px;
         }
     }
 </style>
@@ -95,19 +116,74 @@
                 <span class="text-danger"><strong>{{ $message }}</strong></span>
             @enderror
 
-            <input id="password" type="password" name="password" placeholder="Contraseña" required>
+            <!-- Contraseña -->
+            <div class="password-container">
+                <input id="password" type="password" name="password" placeholder="Contraseña" required>
+                <svg id="eye-open" class="toggle-password" onclick="togglePassword('password')" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5
+                             c4.477 0 8.268 2.943 9.542 7
+                             -1.274 4.057-5.065 7-9.542 7
+                             -4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            </div>
             @error('password')
                 <span class="text-danger"><strong>{{ $message }}</strong></span>
             @enderror
 
-            <input id="password-confirm" type="password" name="password_confirmation" placeholder="Confirmar contraseña" required>
+            <!-- Confirmar contraseña -->
+            <div class="password-container">
+                <input id="password-confirm" type="password" name="password_confirmation" placeholder="Confirmar contraseña" required>
+                <svg id="eye-open-confirm" class="toggle-password" onclick="togglePassword('password-confirm')" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5
+                             c4.477 0 8.268 2.943 9.542 7
+                             -1.274 4.057-5.065 7-9.542 7
+                             -4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            </div>
 
             <button type="submit">Registrarse</button>
         </form>
     </div>
 
     <div>
-        <img src="{{ asset('images/doctor_bot.png') }}" alt="Doctor Bot" class="doctor-image">
+        <img src="{{ asset('images/logo1.png') }}" alt="Doctor Bot" class="doctor-image">
     </div>
 </div>
 @endsection
+
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        const svg = input.nextElementSibling;
+        if (input.type === "password") {
+            input.type = "text";
+            svg.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19
+                         c-4.478 0-8.269-2.943-9.542-7
+                         a10.044 10.044 0 012.293-3.95m3.65-2.577A9.956 9.956 0 0112 5
+                         c4.478 0 8.269 2.943 9.542 7
+                         a9.978 9.978 0 01-4.432 5.568M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 3l18 18" />
+            `;
+        } else {
+            input.type = "password";
+            svg.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5
+                         c4.477 0 8.268 2.943 9.542 7
+                         -1.274 4.057-5.065 7-9.542 7
+                         -4.477 0-8.268-2.943-9.542-7z" />
+            `;
+        }
+    }
+</script>
