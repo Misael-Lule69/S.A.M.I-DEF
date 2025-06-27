@@ -24,7 +24,7 @@
         padding: 40px;
         box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 700px;
+        max-width: 600px; /* Aumentado de 400px a 500px */
         text-align: center;
     }
 

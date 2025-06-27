@@ -6,7 +6,7 @@
         <div class="card border-0">
             <div class="card-header bg-white border-0">
                 <h2>Configuración de Horarios</h2>
-                <p class="text-muted">Configure sus bloques de trabajo y descansos de manera visual e intuitiva</p>
+                <p class="text-muted">Configure sus bloques de trabajo y descansos de manera visual e intuitiva.</p>
             </div>
             
             <div class="card-body">
