@@ -36,11 +36,16 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'pacientes',
     ],
+
+    'medico' => [
+        'driver' => 'session',
+        'provider' => 'medicos',
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -60,16 +65,16 @@ return [
     */
 
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+    'pacientes' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Paciente::class,
     ],
+
+    'medicos' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Medico::class,
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------

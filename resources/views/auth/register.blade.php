@@ -101,18 +101,28 @@
 
 <div class="register-container">
     <div class="register-box">
-        <h2>Crear cuenta</h2>
+        <h2>Registro de Paciente</h2>
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
-            <input id="name" type="text" name="name" value="{{ old('name') }}" placeholder="Nombre" required autofocus>
-            @error('name')
+            <input id="nombre" type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Nombre" required autofocus>
+            @error('nombre')
                 <span class="text-danger"><strong>{{ $message }}</strong></span>
             @enderror
 
-            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="Correo electrónico" required>
-            @error('email')
+            <input id="apellido_paterno" type="text" name="apellido_paterno" value="{{ old('apellido_paterno') }}" placeholder="Apellido Paterno" required>
+            @error('apellido_paterno')
+                <span class="text-danger"><strong>{{ $message }}</strong></span>
+            @enderror
+
+            <input id="apellido_materno" type="text" name="apellido_materno" value="{{ old('apellido_materno') }}" placeholder="Apellido Materno">
+            @error('apellido_materno')
+                <span class="text-danger"><strong>{{ $message }}</strong></span>
+            @enderror
+
+            <input id="telefono" type="text" name="telefono" value="{{ old('telefono') }}" placeholder="Número de Teléfono" required>
+            @error('telefono')
                 <span class="text-danger"><strong>{{ $message }}</strong></span>
             @enderror
 
@@ -148,6 +158,11 @@
             </div>
 
             <button type="submit">Registrarse</button>
+
+            <div class="text-center mt-3">
+                <span class="text-muted">¿Ya tienes una cuenta?</span>
+                <a href="{{ route('login') }}" class="text-primary ms-1">Inicia sesión aquí</a>
+            </div>
         </form>
     </div>
 
