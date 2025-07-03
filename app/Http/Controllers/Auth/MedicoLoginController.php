@@ -16,25 +16,25 @@ class MedicoLoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'usuario' => 'required|string',
+            'email' => 'required|email', // Cambiar de 'usuario' a 'email'
             'password' => 'required|string',
         ]);
 
         if (Auth::guard('medico')->attempt([
-            'usuario' => $request->usuario,
+            'email' => $request->email,
             'password' => $request->password
         ], $request->remember)) {
             return redirect()->intended('/home');
         }
 
         return back()->withErrors([
-            'usuario' => 'Credenciales incorrectas.',
+            'email' => 'Credenciales incorrectas.',
         ]);
     }
 
     public function logout()
-{
-    Auth::guard('medico')->logout();
-    return redirect('/medico/login');  // Redirige al login de médico
-}
+    {
+        Auth::guard('medico')->logout();
+        return redirect('/medico/login');
+    }
 }

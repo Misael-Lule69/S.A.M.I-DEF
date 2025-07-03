@@ -331,10 +331,10 @@
                 <div class="logo">SAMI</div>
                 <ul class="nav-menu">
                     @if(Auth::guard('medico')->check())
-                    <!-- Menú para médico -->
-                    <li class="{{ request()->is('home') ? 'active' : '' }}">
-                        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i> Inicio</a>
-                    </li>
+    <!-- Menú para médico -->
+    <li class="{{ request()->is('home') ? 'active' : '' }}">
+        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i> Inicio</a>
+    </li>
                     <li class="{{ request()->is('horarios') ? 'active' : '' }}">
                         <a href="{{ route('horarios') }}"><i class="bi bi-calendar3"></i> Horarios</a>
                     </li>

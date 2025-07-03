@@ -106,10 +106,11 @@
         <form method="POST" action="{{ route('medico.login') }}">
             @csrf
 
-            <input id="usuario" type="text" name="usuario" value="{{ old('usuario') }}" placeholder="Usuario" required autofocus>
-            @error('usuario')
-                <span class="text-danger"><strong>{{ $message }}</strong></span>
-            @enderror
+            <!-- Cambiar campo de usuario a email -->
+<input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="Correo electrónico" required autofocus>
+@error('email')
+    <span class="text-danger"><strong>{{ $message }}</strong></span>
+@enderror
 
             <div class="password-container">
                 <input id="password" type="password" name="password" placeholder="Contraseña" required>
