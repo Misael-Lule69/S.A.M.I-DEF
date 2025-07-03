@@ -9,11 +9,14 @@ use Illuminate\Support\Facades\Hash;
 class MedicoSeeder extends Seeder
 {
     public function run()
-    {
-        Medico::create([
-            'usuario' => 'Maricela',
-            'password' => Hash::make('12345678'),
-            'nombre_completo' => 'Maricela Mayorga'
-        ]);
-    }
+{
+    \App\Models\User::create([
+        'name' => 'Maricela Mayorga',
+        'email' => 'maricela@gmail.com',
+        'password' => bcrypt('12345678'),
+        // otros campos necesarios
+    ]);
+    
+    // Puedes agregar más médicos aquí
+}
 }

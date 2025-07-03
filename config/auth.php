@@ -38,14 +38,20 @@ return [
     'guards' => [
     'web' => [
         'driver' => 'session',
+        'provider' => 'users',
+    ],
+
+    'paciente' => [
+        'driver' => 'session',
         'provider' => 'pacientes',
     ],
 
     'medico' => [
         'driver' => 'session',
-        'provider' => 'medicos',
+        'provider' => 'users', // Médicos usan la tabla users
     ],
 ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -65,6 +71,18 @@ return [
     */
 
     'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
+    ],
+
+    'providers' => [
     'pacientes' => [
         'driver' => 'eloquent',
         'model' => App\Models\Paciente::class,
@@ -75,6 +93,8 @@ return [
         'model' => App\Models\Medico::class,
     ],
 ],
+
+
 
     /*
     |--------------------------------------------------------------------------
