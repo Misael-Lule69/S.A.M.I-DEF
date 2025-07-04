@@ -30,7 +30,7 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 
 // Rutas protegidas para PACIENTES
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:paciente'])->group(function () {
     // Ruta de logout para pacientes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
