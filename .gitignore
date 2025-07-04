@@ -21,3 +21,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+database/migrations/2025_06_25_033418_create_pacientes_table.php
+
