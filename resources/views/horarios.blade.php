@@ -917,32 +917,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Toggle para activar/desactivar día
-    document.querySelectorAll('.day-toggle').forEach(toggle => {
-        toggle.addEventListener('change', function() {
-            const day = this.id.replace('toggle-', '');
-            
-            // No permitir activar si no hay bloques
-            if (this.checked && scheduleData[day].blocks.length === 0) {
-                this.checked = false;
-                Swal.fire({
-                    title: 'Error',
-                    text: 'No puedes activar un día sin bloques definidos. Por favor, agrega al menos un bloque primero.',
-                    icon: 'error'
-                });
-                return;
-            }
-            
-            scheduleData[day].active = this.checked;
-            
-            if (!this.checked) {
-                scheduleData[day].blocks = [];
-            }
-            
-            updateDayCard(day);
-            updateGlobalStats();
-        });
+    // Toggle para activar/desactivar día - MODIFICADO para no borrar bloques al desactivar
+document.querySelectorAll('.day-toggle').forEach(toggle => {
+    toggle.addEventListener('change', function() {
+        const day = this.id.replace('toggle-', '');
+        
+        // No permitir activar si no hay bloques
+        if (this.checked && scheduleData[day].blocks.length === 0) {
+            this.checked = false;
+            Swal.fire({
+                title: 'Error',
+                text: 'No puedes activar un día sin bloques definidos. Por favor, agrega al menos un bloque primero.',
+                icon: 'error'
+            });
+            return;
+        }
+        
+        // Solo actualizar el estado activo, no tocar los bloques
+        scheduleData[day].active = this.checked;
+        
+        updateDayCard(day);
+        updateGlobalStats();
     });
+});
     
     // Manejar días de descanso
     document.querySelectorAll('.day-off-checkbox').forEach(checkbox => {
@@ -1036,98 +1033,92 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Función para actualizar la tarjeta de un día
-    function updateDayCard(day) {
-        const dayData = scheduleData[day];
-        const dayCard = document.querySelector(`.day-card[data-day="${day}"]`);
+    // Función para actualizar la tarjeta de un día - MODIFICADA para no desactivar automáticamente
+function updateDayCard(day) {
+    const dayData = scheduleData[day];
+    const dayCard = document.querySelector(`.day-card[data-day="${day}"]`);
+    
+    if (!dayCard) return;
+    
+    const noBlocksMsg = dayCard.querySelector('.no-blocks-message');
+    const timelineContainer = dayCard.querySelector('.timeline-container');
+    const timelineItems = dayCard.querySelector('.timeline-items');
+    const dayStats = dayCard.querySelector('.day-stats');
+    const dayToggle = document.getElementById(`toggle-${day}`);
+    
+    // Filtrar bloques que no cumplan con la duración mínima
+    const validBlocks = dayData.blocks.filter(block => {
+        const startParts = block.startTime ? block.startTime.split(':') : block.start.split(':');
+        const endParts = block.endTime ? block.endTime.split(':') : block.end.split(':');
+        const startDate = new Date(2000, 0, 1, parseInt(startParts[0]), parseInt(startParts[1]));
+        const endDate = new Date(2000, 0, 1, parseInt(endParts[0]), parseInt(endParts[1]));
+        const durationMinutes = (endDate - startDate) / (1000 * 60);
+        return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+    });
+    
+    // Actualizar estadísticas del día
+    if (dayStats) {
+        dayStats.textContent = `${validBlocks.length} ${validBlocks.length === 1 ? 'bloque' : 'bloques'}`;
+    }
+    
+    // Mostrar u ocultar mensaje de no bloques
+    if (validBlocks.length === 0) {
+        noBlocksMsg?.classList.remove('d-none');
+        timelineContainer?.classList.add('d-none');
+    } else {
+        noBlocksMsg?.classList.add('d-none');
+        timelineContainer?.classList.remove('d-none');
         
-        if (!dayCard) return;
-        
-        const noBlocksMsg = dayCard.querySelector('.no-blocks-message');
-        const timelineContainer = dayCard.querySelector('.timeline-container');
-        const timelineItems = dayCard.querySelector('.timeline-items');
-        const dayStats = dayCard.querySelector('.day-stats');
-        const dayToggle = document.getElementById(`toggle-${day}`);
-        
-        // Filtrar bloques que no cumplan con la duración mínima
-        const validBlocks = dayData.blocks.filter(block => {
-            const startParts = block.startTime ? block.startTime.split(':') : block.start.split(':');
-            const endParts = block.endTime ? block.endTime.split(':') : block.end.split(':');
-            const startDate = new Date(2000, 0, 1, parseInt(startParts[0]), parseInt(startParts[1]));
-            const endDate = new Date(2000, 0, 1, parseInt(endParts[0]), parseInt(endParts[1]));
-            const durationMinutes = (endDate - startDate) / (1000 * 60);
-            return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+        // Ordenar bloques por hora de inicio
+        validBlocks.sort((a, b) => {
+            const aTime = a.startTime || a.start;
+            const bTime = b.startTime || b.start;
+            return aTime.localeCompare(bTime);
         });
         
-        // Si no hay bloques válidos pero el día está activo, desactivarlo
-        if (validBlocks.length === 0 && dayData.active) {
-            dayData.active = false;
-            if (dayToggle) dayToggle.checked = false;
-        }
-        
-        // Actualizar estadísticas del día
-        if (dayStats) {
-            dayStats.textContent = `${validBlocks.length} ${validBlocks.length === 1 ? 'bloque' : 'bloques'}`;
-        }
-        
-        // Mostrar u ocultar mensaje de no bloques
-        if (validBlocks.length === 0) {
-            noBlocksMsg?.classList.remove('d-none');
-            timelineContainer?.classList.add('d-none');
-        } else {
-            noBlocksMsg?.classList.add('d-none');
-            timelineContainer?.classList.remove('d-none');
-            
-            // Ordenar bloques por hora de inicio
-            validBlocks.sort((a, b) => {
-                const aTime = a.startTime || a.start;
-                const bTime = b.startTime || b.start;
-                return aTime.localeCompare(bTime);
+        // Generar timeline
+        if (timelineItems) {
+            timelineItems.innerHTML = '';
+            validBlocks.forEach(block => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = `timeline-item ${block.type} position-relative`;
+                timelineItem.dataset.id = block.id;
+                
+                const startTime = block.startTime || block.start;
+                const endTime = block.endTime || block.end;
+                
+                timelineItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <span class="block-time">${startTime} - ${endTime}</span>
+                        <span class="badge ${block.type === 'work' ? 'bg-primary' : 'bg-secondary'}">
+                            ${block.type === 'work' ? 'Trabajo' : 'Descanso'}
+                        </span>
+                    </div>
+                    <div class="block-label">${block.label || (block.type === 'work' ? 'Trabajo' : 'Descanso')}</div>
+                    <div class="block-actions">
+                        <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">Editar</button>
+                        <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">Eliminar</button>
+                    </div>
+                `;
+                
+                timelineItems.appendChild(timelineItem);
             });
-            
-            // Generar timeline
-            if (timelineItems) {
-                timelineItems.innerHTML = '';
-                validBlocks.forEach(block => {
-                    const timelineItem = document.createElement('div');
-                    timelineItem.className = `timeline-item ${block.type} position-relative`;
-                    timelineItem.dataset.id = block.id;
-                    
-                    const startTime = block.startTime || block.start;
-                    const endTime = block.endTime || block.end;
-                    
-                    timelineItem.innerHTML = `
-                        <div class="d-flex justify-content-between">
-                            <span class="block-time">${startTime} - ${endTime}</span>
-                            <span class="badge ${block.type === 'work' ? 'bg-primary' : 'bg-secondary'}">
-                                ${block.type === 'work' ? 'Trabajo' : 'Descanso'}
-                            </span>
-                        </div>
-                        <div class="block-label">${block.label || (block.type === 'work' ? 'Trabajo' : 'Descanso')}</div>
-                        <div class="block-actions">
-                            <button class="btn btn-sm btn-primary edit-block me-1" data-id="${block.id}">Editar</button>
-                            <button class="btn btn-sm btn-outline-danger delete-block" data-id="${block.id}">Eliminar</button>
-                        </div>
-                    `;
-                    
-                    timelineItems.appendChild(timelineItem);
-                });
-            }
-        }
-        
-        // Actualizar estadísticas globales
-        updateGlobalStats();
-        // Actualizar calendario
-        updateCalendar();
-        
-        // Actualizar checkboxes de días de descanso
-        const dayOffCheckbox = document.querySelector(`.day-off-checkbox[data-day="${day}"]`);
-        if (dayData.blocks.length === 1 && dayData.blocks[0].label === 'Día de descanso') {
-            if (dayOffCheckbox) dayOffCheckbox.checked = true;
-        } else {
-            if (dayOffCheckbox) dayOffCheckbox.checked = false;
         }
     }
+    
+    // Actualizar estadísticas globales
+    updateGlobalStats();
+    // Actualizar calendario
+    updateCalendar();
+    
+    // Actualizar checkboxes de días de descanso
+    const dayOffCheckbox = document.querySelector(`.day-off-checkbox[data-day="${day}"]`);
+    if (dayData.blocks.length === 1 && dayData.blocks[0].label === 'Día de descanso') {
+        if (dayOffCheckbox) dayOffCheckbox.checked = true;
+    } else {
+        if (dayOffCheckbox) dayOffCheckbox.checked = false;
+    }
+}
     
     // Guardar horario con validación de días activos sin bloques
     document.getElementById('save-schedule').addEventListener('click', function() {
