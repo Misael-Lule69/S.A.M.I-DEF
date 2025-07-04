@@ -525,6 +525,9 @@ document.addEventListener('DOMContentLoaded', function() {
         'domingo': { active: false, blocks: [] }
     };
     
+    // Duración mínima de bloque en minutos (15 minutos)
+    const MIN_BLOCK_DURATION_MINUTES = 15;
+    
     let calendar = null;
     let isEditing = false;
     const blockModal = new bootstrap.Modal(document.getElementById('blockModal'));
@@ -634,18 +637,27 @@ document.addEventListener('DOMContentLoaded', function() {
         for (const day in scheduleData) {
             if (scheduleData[day].active && scheduleData[day].blocks.length > 0) {
                 scheduleData[day].blocks.forEach(block => {
-                    events.push({
-                        title: block.label || (block.type === 'work' ? 'Trabajo' : 'Descanso'),
-                        startTime: block.startTime || block.start,
-                        endTime: block.endTime || block.end,
-                        daysOfWeek: [daysMap[day]],
-                        type: block.type,
-                        backgroundColor: block.type === 'work' ? '#0d6efd' : '#6c757d',
-                        borderColor: block.type === 'work' ? '#0b5ed7' : '#5c636a',
-                        extendedProps: {
-                            type: block.type
-                        }
-                    });
+                    // Filtrar bloques que no cumplan con la duración mínima
+                    const startParts = block.startTime ? block.startTime.split(':') : block.start.split(':');
+                    const endParts = block.endTime ? block.endTime.split(':') : block.end.split(':');
+                    const startDate = new Date(2000, 0, 1, parseInt(startParts[0]), parseInt(startParts[1]));
+                    const endDate = new Date(2000, 0, 1, parseInt(endParts[0]), parseInt(endParts[1]));
+                    const durationMinutes = (endDate - startDate) / (1000 * 60);
+                    
+                    if (durationMinutes >= MIN_BLOCK_DURATION_MINUTES) {
+                        events.push({
+                            title: block.label || (block.type === 'work' ? 'Trabajo' : 'Descanso'),
+                            startTime: block.startTime || block.start,
+                            endTime: block.endTime || block.end,
+                            daysOfWeek: [daysMap[day]],
+                            type: block.type,
+                            backgroundColor: block.type === 'work' ? '#0d6efd' : '#6c757d',
+                            borderColor: block.type === 'work' ? '#0b5ed7' : '#5c636a',
+                            extendedProps: {
+                                type: block.type
+                            }
+                        });
+                    }
                 });
             }
         }
@@ -671,10 +683,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (scheduleData[day].active) {
                 activeDays++;
             }
-            totalBlocks += scheduleData[day].blocks.length;
+            
+            // Solo contar bloques que cumplan con la duración mínima
+            const validBlocks = scheduleData[day].blocks.filter(block => {
+                const startParts = block.startTime ? block.startTime.split(':') : block.start.split(':');
+                const endParts = block.endTime ? block.endTime.split(':') : block.end.split(':');
+                const startDate = new Date(2000, 0, 1, parseInt(startParts[0]), parseInt(startParts[1]));
+                const endDate = new Date(2000, 0, 1, parseInt(endParts[0]), parseInt(endParts[1]));
+                const durationMinutes = (endDate - startDate) / (1000 * 60);
+                return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+            });
+            
+            totalBlocks += validBlocks.length;
             
             // Calcular horas totales
-            scheduleData[day].blocks.forEach(block => {
+            validBlocks.forEach(block => {
                 const start = block.startTime || block.start;
                 const end = block.endTime || block.end;
                 
@@ -728,7 +751,7 @@ document.addEventListener('DOMContentLoaded', function() {
         blockModal.show();
     });
     
-    // Guardar bloque
+    // Guardar bloque con validación de duración mínima
     document.getElementById('save-block').addEventListener('click', function() {
         const day = document.getElementById('block-day').value;
         const blockId = document.getElementById('block-id').value;
@@ -754,13 +777,26 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Calcular duración en minutos
+        const startParts = startTime.split(':').map(Number);
+        const endParts = endTime.split(':').map(Number);
+        const startDate = new Date(2000, 0, 1, startParts[0], startParts[1]);
+        const endDate = new Date(2000, 0, 1, endParts[0], endParts[1]);
+        const durationMinutes = (endDate - startDate) / (1000 * 60);
+        
+        // Validar duración mínima
+        if (durationMinutes < MIN_BLOCK_DURATION_MINUTES) {
+            alert(`La duración mínima de un bloque es de ${MIN_BLOCK_DURATION_MINUTES} minutos`);
+            return;
+        }
+        
         // Crear o actualizar bloque
         const block = {
             type,
             startTime: startTime,
             endTime: endTime,
             start: startTime, // Compatibilidad con backend
-            end: endTime,      // Compatibilidad con backend
+            end: endTime,    // Compatibilidad con backend
             label,
             id: blockId || Date.now().toString()
         };
@@ -789,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function() {
         blockModal.hide();
     });
     
-    // Selección de plantilla
+    // Selección de plantilla con validación de duración
     document.getElementById('template-select').addEventListener('change', function() {
         const template = this.value;
         if (!template) return;
@@ -827,8 +863,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
         
-        // Activar el día si no estaba activo
-        if (!dayData.active) {
+        // Validar que los bloques de la plantilla cumplan con la duración mínima
+        dayData.blocks = dayData.blocks.filter(block => {
+            const startParts = block.startTime.split(':').map(Number);
+            const endParts = block.endTime.split(':').map(Number);
+            const startDate = new Date(2000, 0, 1, startParts[0], startParts[1]);
+            const endDate = new Date(2000, 0, 1, endParts[0], endParts[1]);
+            const durationMinutes = (endDate - startDate) / (1000 * 60);
+            return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+        });
+        
+        // Activar el día si no estaba activo y hay bloques válidos
+        if (!dayData.active && dayData.blocks.length > 0) {
             document.getElementById(`toggle-${day.toLowerCase()}`).checked = true;
             dayData.active = true;
         }
@@ -841,6 +887,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.day-toggle').forEach(toggle => {
         toggle.addEventListener('change', function() {
             const day = this.id.replace('toggle-', '');
+            
+            // No permitir activar si no hay bloques
+            if (this.checked && scheduleData[day].blocks.length === 0) {
+                this.checked = false;
+                alert('No puedes activar un día sin bloques definidos. Por favor, agrega al menos un bloque primero.');
+                return;
+            }
+            
             scheduleData[day].active = this.checked;
             
             if (!this.checked) {
@@ -906,6 +960,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const index = scheduleData[day].blocks.findIndex(b => b.id === blockId);
                 if (index !== -1) {
                     scheduleData[day].blocks.splice(index, 1);
+                    
+                    // Si era el último bloque, desactivar el día
+                    if (scheduleData[day].blocks.length === 0 && scheduleData[day].active) {
+                        scheduleData[day].active = false;
+                        document.getElementById(`toggle-${day}`).checked = false;
+                    }
+                    
                     updateDayCard(day);
                     break;
                 }
@@ -948,14 +1009,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const timelineContainer = dayCard.querySelector('.timeline-container');
         const timelineItems = dayCard.querySelector('.timeline-items');
         const dayStats = dayCard.querySelector('.day-stats');
+        const dayToggle = document.getElementById(`toggle-${day}`);
+        
+        // Filtrar bloques que no cumplan con la duración mínima
+        const validBlocks = dayData.blocks.filter(block => {
+            const startParts = block.startTime ? block.startTime.split(':') : block.start.split(':');
+            const endParts = block.endTime ? block.endTime.split(':') : block.end.split(':');
+            const startDate = new Date(2000, 0, 1, parseInt(startParts[0]), parseInt(startParts[1]));
+            const endDate = new Date(2000, 0, 1, parseInt(endParts[0]), parseInt(endParts[1]));
+            const durationMinutes = (endDate - startDate) / (1000 * 60);
+            return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+        });
+        
+        // Si no hay bloques válidos pero el día está activo, desactivarlo
+        if (validBlocks.length === 0 && dayData.active) {
+            dayData.active = false;
+            if (dayToggle) dayToggle.checked = false;
+        }
         
         // Actualizar estadísticas del día
         if (dayStats) {
-            dayStats.textContent = `${dayData.blocks.length} ${dayData.blocks.length === 1 ? 'bloque' : 'bloques'}`;
+            dayStats.textContent = `${validBlocks.length} ${validBlocks.length === 1 ? 'bloque' : 'bloques'}`;
         }
         
         // Mostrar u ocultar mensaje de no bloques
-        if (dayData.blocks.length === 0) {
+        if (validBlocks.length === 0) {
             noBlocksMsg?.classList.remove('d-none');
             timelineContainer?.classList.add('d-none');
         } else {
@@ -963,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
             timelineContainer?.classList.remove('d-none');
             
             // Ordenar bloques por hora de inicio
-            dayData.blocks.sort((a, b) => {
+            validBlocks.sort((a, b) => {
                 const aTime = a.startTime || a.start;
                 const bTime = b.startTime || b.start;
                 return aTime.localeCompare(bTime);
@@ -972,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Generar timeline
             if (timelineItems) {
                 timelineItems.innerHTML = '';
-                dayData.blocks.forEach(block => {
+                validBlocks.forEach(block => {
                     const timelineItem = document.createElement('div');
                     timelineItem.className = `timeline-item ${block.type} position-relative`;
                     timelineItem.dataset.id = block.id;
@@ -1013,8 +1091,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Guardar horario
+    // Guardar horario con validación de días activos sin bloques
     document.getElementById('save-schedule').addEventListener('click', function() {
+        // Validar que no haya días activos sin bloques
+        const daysWithoutBlocks = [];
+        for (const day in scheduleData) {
+            if (scheduleData[day].active && scheduleData[day].blocks.length === 0) {
+                daysWithoutBlocks.push(day.charAt(0).toUpperCase() + day.slice(1)); // Capitalizar nombre del día
+            }
+        }
+        
+        if (daysWithoutBlocks.length > 0) {
+            alert(`Los siguientes días están activos pero no tienen bloques definidos:\n${daysWithoutBlocks.join(', ')}\n\nPor favor, agregue bloques o desactive estos días.`);
+            return;
+        }
+        
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
         // Prepara los datos para enviar
