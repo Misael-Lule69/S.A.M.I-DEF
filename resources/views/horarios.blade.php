@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('block-id').value = '';
         isEditing = false;
         document.getElementById('block-form').reset();
-        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque de Descanso';
+        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque de Descanso.';
         blockModal.show();
     });
     
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!startTime || !endTime) {
             Swal.fire({
                 title: 'Error',
-                text: 'Por favor, completa las horas de inicio y fin',
+                text: 'Por favor, completa las horas de inicio y fin.',
                 icon: 'error'
             });
             return;
@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (startTime >= endTime) {
             Swal.fire({
                 title: 'Error',
-                text: 'La hora de fin debe ser mayor que la hora de inicio',
+                text: 'La hora de fin debe ser mayor que la hora de inicio.',
                 icon: 'error'
             });
             return;
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonText: 'Cancelar',
             preConfirm: (day) => {
                 if (!day || !scheduleData[day.toLowerCase()]) {
-                    Swal.showValidationMessage('Día no válido');
+                    Swal.showValidationMessage('Día no válido.');
                     this.value = '';
                     return false;
                 }
@@ -1181,7 +1181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 Swal.fire({
                     title: 'Éxito',
-                    text: 'Horarios guardados correctamente',
+                    text: 'Horarios guardados correctamente.',
                     icon: 'success'
                 });
                 // Recargar los datos después de guardar
@@ -1198,7 +1198,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             Swal.fire({
                 title: 'Error',
-                text: 'Error al conectar con el servidor',
+                text: 'Error al conectar con el servidor.',
                 icon: 'error'
             });
         });
