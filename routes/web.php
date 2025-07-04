@@ -6,9 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HorarioController;
 
-
-
-// Rutas de autenticación (desactivando registro)
+// Rutas de autenticación (activando registro)
 Auth::routes(['register' => true]);
 
 // Ruta raíz - redirige a login o home según autenticación
@@ -26,9 +24,22 @@ Route::middleware(['auth'])->group(function () {
     // Ruta home
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     
-    // Ruta de horarios
-    Route::get('/horarios', [HorarioController::class, 'index'])->name('horarios');
-    
-    // Ruta para obtener eventos del calendario (AJAX)
-    Route::get('/horarios/eventos', [HorarioController::class, 'getEventos'])->name('horarios.eventos');
+    // Rutas de horarios
+    Route::prefix('horarios')->group(function () {
+        Route::get('/', [HorarioController::class, 'index'])->name('horarios');
+        Route::get('/eventos', [HorarioController::class, 'getEventos'])->name('horarios.eventos');
+        Route::post('/guardar', [HorarioController::class, 'guardar'])->name('horarios.guardar');
+    });
+
+    Route::get('/schedules', function() {
+    try {
+        $schedules = App\Models\Schedule::all(); // O usa where() si necesitas filtrar
+        return response()->json($schedules);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al obtener los horarios',
+            'details' => $e->getMessage()
+        ], 500);
+    }
+});
 });
