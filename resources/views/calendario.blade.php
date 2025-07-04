@@ -1,7 +1,7 @@
 <!-- calendario.blade.php -->
 <div class="calendar-container">
     <div class="calendar-header">
-        <h4 class="calendar-title">Calendario de Citas</h4>
+        <h4 class="calendar-title">Calendario de Citas.</h4>
         <div class="calendar-actions">
             <button class="btn btn-sm btn-outline-primary prev-month"><i class="bi bi-chevron-left"></i></button>
             <span class="current-month" id="currentMonth">Junio 2023</span>

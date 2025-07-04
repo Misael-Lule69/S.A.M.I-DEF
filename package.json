@@ -21,6 +21,7 @@
         "@fullcalendar/core": "^6.1.17",
         "@fullcalendar/daygrid": "^6.1.17",
         "@fullcalendar/interaction": "^6.1.17",
-        "@fullcalendar/timegrid": "^6.1.17"
+        "@fullcalendar/timegrid": "^6.1.17",
+        "sweetalert2": "^11.22.2"
     }
 }

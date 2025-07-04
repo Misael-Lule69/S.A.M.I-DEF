@@ -28,7 +28,7 @@
     }
 
     .register-box h2 {
-        font-weight: 700;
+        font-weight: 600;
         color: #5a189a;
         margin-bottom: 30px;
     }

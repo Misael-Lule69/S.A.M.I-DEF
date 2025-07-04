@@ -1,12 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container-fluid">
     <div class="col-md-12">
         <div class="card border-0">
             <div class="card-header bg-white border-0">
                 <h2>Configuración de Horarios</h2>
-                <p class="text-muted">Configure sus bloques de trabajo y descansos de manera visual e intuitiva</p>
+                <p class="text-muted">Configure sus bloques de trabajo y descansos de manera visual e intuitiva.</p>
             </div>
             
             <div class="card-body">
@@ -747,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('block-id').value = '';
         isEditing = false;
         document.getElementById('block-form').reset();
-        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque de Descanso';
+        document.getElementById('blockModal').querySelector('.modal-title').textContent = 'Agregar Bloque de Descanso.';
         blockModal.show();
     });
     
@@ -757,7 +759,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const blockId = document.getElementById('block-id').value;
         
         if (!day) {
-            alert('Por favor, selecciona un día primero');
+            Swal.fire({
+                title: 'Error',
+                text: 'Por favor, selecciona un día primero',
+                icon: 'error'
+            });
             return;
         }
         
@@ -767,13 +773,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const label = document.getElementById('block-label').value || (type === 'work' ? 'Trabajo' : 'Descanso');
         
         if (!startTime || !endTime) {
-            alert('Por favor, completa las horas de inicio y fin');
+            Swal.fire({
+                title: 'Error',
+                text: 'Por favor, completa las horas de inicio y fin.',
+                icon: 'error'
+            });
             return;
         }
         
         // Validar que la hora de fin sea mayor que la de inicio
         if (startTime >= endTime) {
-            alert('La hora de fin debe ser mayor que la hora de inicio');
+            Swal.fire({
+                title: 'Error',
+                text: 'La hora de fin debe ser mayor que la hora de inicio.',
+                icon: 'error'
+            });
             return;
         }
         
@@ -786,7 +800,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Validar duración mínima
         if (durationMinutes < MIN_BLOCK_DURATION_MINUTES) {
-            alert(`La duración mínima de un bloque es de ${MIN_BLOCK_DURATION_MINUTES} minutos`);
+            Swal.fire({
+                title: 'Error',
+                text: `La duración mínima de un bloque es de ${MIN_BLOCK_DURATION_MINUTES} minutos`,
+                icon: 'error'
+            });
             return;
         }
         
@@ -830,57 +848,73 @@ document.addEventListener('DOMContentLoaded', function() {
         const template = this.value;
         if (!template) return;
         
-        const day = prompt("¿A qué día quieres aplicar esta plantilla? (lunes, martes, etc.)");
-        if (!day || !scheduleData[day.toLowerCase()]) {
-            alert('Día no válido');
-            this.value = '';
-            return;
-        }
-        
-        const dayData = scheduleData[day.toLowerCase()];
-        
-        // Limpiar bloques existentes
-        dayData.blocks = [];
-        
-        // Aplicar plantilla seleccionada
-        switch(template) {
-            case 'full-day':
-                dayData.blocks = [
-                    { type: 'work', startTime: '09:00', start: '09:00', endTime: '13:00', end: '13:00', label: 'Mañana', id: Date.now().toString() + 1 },
-                    { type: 'break', startTime: '13:00', start: '13:00', endTime: '14:00', end: '14:00', label: 'Almuerzo', id: Date.now().toString() + 2 },
-                    { type: 'work', startTime: '14:00', start: '14:00', endTime: '18:00', end: '18:00', label: 'Tarde', id: Date.now().toString() + 3 }
-                ];
-                break;
-            case 'morning':
-                dayData.blocks = [
-                    { type: 'work', startTime: '09:00', start: '09:00', endTime: '13:00', end: '13:00', label: 'Mañana', id: Date.now().toString() + 1 }
-                ];
-                break;
-            case 'afternoon':
-                dayData.blocks = [
-                    { type: 'work', startTime: '14:00', start: '14:00', endTime: '18:00', end: '18:00', label: 'Tarde', id: Date.now().toString() + 1 }
-                ];
-                break;
-        }
-        
-        // Validar que los bloques de la plantilla cumplan con la duración mínima
-        dayData.blocks = dayData.blocks.filter(block => {
-            const startParts = block.startTime.split(':').map(Number);
-            const endParts = block.endTime.split(':').map(Number);
-            const startDate = new Date(2000, 0, 1, startParts[0], startParts[1]);
-            const endDate = new Date(2000, 0, 1, endParts[0], endParts[1]);
-            const durationMinutes = (endDate - startDate) / (1000 * 60);
-            return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+        Swal.fire({
+            title: 'Aplicar plantilla',
+            text: '¿A qué día quieres aplicar esta plantilla? (lunes, martes, etc.)',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Aplicar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: (day) => {
+                if (!day || !scheduleData[day.toLowerCase()]) {
+                    Swal.showValidationMessage('Día no válido.');
+                    this.value = '';
+                    return false;
+                }
+                return day.toLowerCase();
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                const day = result.value;
+                const dayData = scheduleData[day];
+                
+                // Limpiar bloques existentes
+                dayData.blocks = [];
+                
+                // Aplicar plantilla seleccionada
+                switch(template) {
+                    case 'full-day':
+                        dayData.blocks = [
+                            { type: 'work', startTime: '09:00', start: '09:00', endTime: '13:00', end: '13:00', label: 'Mañana', id: Date.now().toString() + 1 },
+                            { type: 'break', startTime: '13:00', start: '13:00', endTime: '14:00', end: '14:00', label: 'Almuerzo', id: Date.now().toString() + 2 },
+                            { type: 'work', startTime: '14:00', start: '14:00', endTime: '18:00', end: '18:00', label: 'Tarde', id: Date.now().toString() + 3 }
+                        ];
+                        break;
+                    case 'morning':
+                        dayData.blocks = [
+                            { type: 'work', startTime: '09:00', start: '09:00', endTime: '13:00', end: '13:00', label: 'Mañana', id: Date.now().toString() + 1 }
+                        ];
+                        break;
+                    case 'afternoon':
+                        dayData.blocks = [
+                            { type: 'work', startTime: '14:00', start: '14:00', endTime: '18:00', end: '18:00', label: 'Tarde', id: Date.now().toString() + 1 }
+                        ];
+                        break;
+                }
+                
+                // Validar que los bloques de la plantilla cumplan con la duración mínima
+                dayData.blocks = dayData.blocks.filter(block => {
+                    const startParts = block.startTime.split(':').map(Number);
+                    const endParts = block.endTime.split(':').map(Number);
+                    const startDate = new Date(2000, 0, 1, startParts[0], startParts[1]);
+                    const endDate = new Date(2000, 0, 1, endParts[0], endParts[1]);
+                    const durationMinutes = (endDate - startDate) / (1000 * 60);
+                    return durationMinutes >= MIN_BLOCK_DURATION_MINUTES;
+                });
+                
+                // Activar el día si no estaba activo y hay bloques válidos
+                if (!dayData.active && dayData.blocks.length > 0) {
+                    document.getElementById(`toggle-${day}`).checked = true;
+                    dayData.active = true;
+                }
+                
+                updateDayCard(day);
+                this.value = ''; // Resetear el selector
+            }
         });
-        
-        // Activar el día si no estaba activo y hay bloques válidos
-        if (!dayData.active && dayData.blocks.length > 0) {
-            document.getElementById(`toggle-${day.toLowerCase()}`).checked = true;
-            dayData.active = true;
-        }
-        
-        updateDayCard(day.toLowerCase());
-        this.value = ''; // Resetear el selector
     });
     
     // Toggle para activar/desactivar día
@@ -891,7 +925,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // No permitir activar si no hay bloques
             if (this.checked && scheduleData[day].blocks.length === 0) {
                 this.checked = false;
-                alert('No puedes activar un día sin bloques definidos. Por favor, agrega al menos un bloque primero.');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No puedes activar un día sin bloques definidos. Por favor, agrega al menos un bloque primero.',
+                    icon: 'error'
+                });
                 return;
             }
             
@@ -1102,7 +1140,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (daysWithoutBlocks.length > 0) {
-            alert(`Los siguientes días están activos pero no tienen bloques definidos:\n${daysWithoutBlocks.join(', ')}\n\nPor favor, agregue bloques o desactive estos días.`);
+            Swal.fire({
+                title: 'Error',
+                html: `Los siguientes días están activos pero no tienen bloques definidos:<br><strong>${daysWithoutBlocks.join(', ')}</strong><br><br>Por favor, agregue bloques o desactive estos días.`,
+                icon: 'error'
+            });
             return;
         }
         
@@ -1132,21 +1174,33 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(dataToSend)
         })
         .then(response => {
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            if (!response.ok) throw new Error('Error en la respuesta del servidor.');
             return response.json();
         })
         .then(data => {
             if (data.success) {
-                alert('Horarios guardados correctamente');
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Horarios guardados correctamente.',
+                    icon: 'success'
+                });
                 // Recargar los datos después de guardar
                 loadSchedules();
             } else {
-                alert('Error al guardar: ' + (data.message || 'Error desconocido'));
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error al guardar: ' + (data.message || 'Error desconocido'),
+                    icon: 'error'
+                });
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error al conectar con el servidor');
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al conectar con el servidor.',
+                icon: 'error'
+            });
         });
     });
 
@@ -1163,5 +1217,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
+
 </script>
 @endsection

@@ -291,30 +291,26 @@
                     <span class="navbar-brand-text">SAMI</span>
                 </a>
 
-                <!-- Menú de navegación derecho -->
-                <div class="navbar-nav-container">
-                    <ul class="navbar-nav">
-                        @guest
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('medico.login') }}">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Acceso Médico
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Acceso Paciente
-                            </a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="btn btn-primary" href="{{ route('register') }}">
-                                <i class="bi bi-person-plus me-1"></i> Registrarse
-                            </a>
-                        </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <!-- Menú de navegación derecho -->
+        <div class="navbar-nav-container">
+            <ul class="navbar-nav">
+                @guest
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="btn btn-primary" href="{{ route('register') }}">
+                        <i class="bi bi-person-plus me-1"></i> Registrarse
+                    </a>
+                </li>
+                @endguest
+            </ul>
+        </div>
+    </div>
+</nav>
+        
         @endunless
 
         @if(Request::is('login') || Request::is('register') || Request::is('medico/login') || Request::is('password/reset*') || Request::is('password/email'))
