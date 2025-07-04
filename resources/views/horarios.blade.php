@@ -1174,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(dataToSend)
         })
         .then(response => {
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            if (!response.ok) throw new Error('Error en la respuesta del servidor.');
             return response.json();
         })
         .then(data => {
@@ -1217,5 +1217,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
+
 </script>
 @endsection
