@@ -24,6 +24,12 @@ class LoginController extends Controller
         return 'telefono';
     }
 
+    // Especificar el guard a usar
+    protected function guard()
+    {
+        return auth()->guard('paciente');
+    }
+
     protected function validateLogin(Request $request)
     {
         $request->validate([
