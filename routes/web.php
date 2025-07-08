@@ -37,7 +37,13 @@ Route::middleware(['auth:paciente'])->group(function () {
     // Dashboard de paciente
     Route::get('/paciente/dashboard', [PacienteController::class, 'dashboard'])->name('paciente.dashboard');
     
-    // Otras rutas específicas de pacientes...
+    // Rutas para citas
+    Route::get('/paciente/agendar-cita', [PacienteController::class, 'mostrarCalendarioCitas'])->name('paciente.calendario-citas');
+    Route::get('/paciente/horarios-disponibles', [PacienteController::class, 'obtenerHorariosDisponibles'])
+    ->name('paciente.horarios-disponibles')
+    ->middleware('auth:paciente');
+    Route::post('/paciente/agendar-cita', [PacienteController::class, 'agendarCita'])->name('paciente.agendar-cita');
+    Route::post('/paciente/cancelar-cita/{id}', [PacienteController::class, 'cancelarCita'])->name('paciente.cancelar-cita');
 });
 
 // Rutas protegidas para MÉDICO (admin)
