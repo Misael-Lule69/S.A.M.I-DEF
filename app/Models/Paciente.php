@@ -23,4 +23,10 @@ class Paciente extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    // Asegúrate de que la clave primaria sea 'id'
+    protected $primaryKey = 'id';
+    
+    // Si tu tabla tiene un nombre diferente
+    protected $table = 'pacientes';
 }
