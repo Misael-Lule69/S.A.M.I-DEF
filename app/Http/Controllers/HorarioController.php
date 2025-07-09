@@ -44,11 +44,16 @@ class HorarioController extends Controller
                     }
                     
                     // Filtrar bloques vacíos o inválidos
-                    $filteredBlocks = array_filter($blocks, function($block) {
+                    $filteredBlocks = array_map(function($block) {
+                        if (!isset($block['id']) || empty($block['id'])) {
+                            $block['id'] = uniqid('', true);
+                        }
+                        return $block;
+                    }, array_filter($blocks, function($block) {
                         return isset($block['start'], $block['end']) && 
                                !empty($block['start']) && 
                                !empty($block['end']);
-                    });
+                    }));
 
                     Schedule::create([
                         'user_id' => $user->id,

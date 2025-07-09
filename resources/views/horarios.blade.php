@@ -985,27 +985,42 @@ document.querySelectorAll('.day-toggle').forEach(toggle => {
         updateGlobalStats();
     });
     
-    // Eliminar bloque
+    // Event delegation para botones de editar y eliminar bloques
     document.addEventListener('click', function(e) {
+        // Eliminar bloque
         if (e.target.classList.contains('delete-block') || e.target.closest('.delete-block')) {
             const button = e.target.classList.contains('delete-block') ? e.target : e.target.closest('.delete-block');
             const blockId = button.dataset.id;
             
-            for (const day in scheduleData) {
-                const index = scheduleData[day].blocks.findIndex(b => b.id === blockId);
-                if (index !== -1) {
-                    scheduleData[day].blocks.splice(index, 1);
-                    
-                    // Si era el último bloque, desactivar el día
-                    if (scheduleData[day].blocks.length === 0 && scheduleData[day].active) {
-                        scheduleData[day].active = false;
-                        document.getElementById(`toggle-${day}`).checked = false;
+            // Confirmar eliminación
+            Swal.fire({
+                title: '¿Eliminar bloque?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    for (const day in scheduleData) {
+                        const index = scheduleData[day].blocks.findIndex(b => b.id === blockId);
+                        if (index !== -1) {
+                            scheduleData[day].blocks.splice(index, 1);
+                            
+                            // Si era el último bloque, desactivar el día
+                            if (scheduleData[day].blocks.length === 0 && scheduleData[day].active) {
+                                scheduleData[day].active = false;
+                                document.getElementById(`toggle-${day}`).checked = false;
+                            }
+                            
+                            updateDayCard(day);
+                            break;
+                        }
                     }
-                    
-                    updateDayCard(day);
-                    break;
                 }
-            }
+            });
         }
         
         // Editar bloque
@@ -1150,7 +1165,8 @@ function updateDayCard(day) {
                     type: block.type,
                     start: block.startTime || block.start,
                     end: block.endTime || block.end,
-                    label: block.label
+                    label: block.label,
+                    id: block.id // <-- ¡Asegúrate de incluir esto!
                 }))
             };
         }
