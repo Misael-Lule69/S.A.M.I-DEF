@@ -30,125 +30,144 @@ class PacienteController extends Controller
     }
 
     public function obtenerHorariosDisponibles(Request $request)
-{
-    try {
-        $request->validate([
-            'fecha' => 'required|date',
-            'consultorio' => 'required|exists:consultorios,id'
-        ]);
+    {
+        try {
+            $request->validate([
+                'fecha' => 'required|date',
+                'consultorio' => 'required|exists:consultorios,id'
+            ]);
 
-        $fecha = $request->fecha;
-        $idConsultorio = $request->consultorio;
+            $fecha = $request->fecha;
+            $idConsultorio = $request->consultorio;
 
-        // Mapeo de días en español sin acentos
-        $diasSemana = [
-            1 => 'lunes',
-            2 => 'martes',
-            3 => 'miercoles',
-            4 => 'jueves',
-            5 => 'viernes',
-            6 => 'sabado',
-            7 => 'domingo'
-        ];
-        
-        $carbonFecha = Carbon::parse($fecha);
-        $diaNumero = $carbonFecha->dayOfWeekIso;
-        
-        if (!isset($diasSemana[$diaNumero])) {
-            throw new \Exception("Día de la semana no válido: {$diaNumero}");
-        }
-        
-        $diaSemana = $diasSemana[$diaNumero];
+            // Mapeo de días en español sin acentos
+            $diasSemana = [
+                1 => 'lunes',
+                2 => 'martes',
+                3 => 'miercoles',
+                4 => 'jueves',
+                5 => 'viernes',
+                6 => 'sabado',
+                7 => 'domingo'
+            ];
 
-        // Obtener el horario configurado para ese día
-        $horario = Schedule::where('day', 'like', $diaSemana)
-            ->where('active', 1)
-            ->first();
+            $carbonFecha = Carbon::parse($fecha);
+            $diaNumero = $carbonFecha->dayOfWeekIso;
 
-        if (!$horario) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No hay horario activo para este día',
-                'horarios' => []
-            ], 200);
-        }
+            if (!isset($diasSemana[$diaNumero])) {
+                throw new \Exception("Día de la semana no válido: {$diaNumero}");
+            }
 
-        // El campo blocks ya es un array gracias al cast en el modelo
-        $bloques = $horario->blocks;
-        
-        if (empty($bloques)) {
-            throw new \Exception("El campo blocks está vacío");
-        }
+            $diaSemana = $diasSemana[$diaNumero];
 
-        if (!is_array($bloques)) {
-            throw new \Exception("El formato de bloques no es válido");
-        }
+            // Obtener el horario configurado para ese día
+            $horario = Schedule::where('day', 'like', $diaSemana)
+                ->where('active', 1)
+                ->first();
 
-        // Filtrar solo bloques de trabajo (work)
-        $bloquesTrabajo = array_filter($bloques, function ($bloque) {
-            return isset($bloque['type']) && $bloque['type'] === 'work';
-        });
+            if (!$horario) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay horario activo para este día',
+                    'horarios' => []
+                ], 200);
+            }
 
-        // Verificar citas ya agendadas
-        $citasAgendadas = Cita::where('fecha', $fecha)
-            ->where('id_consultorio', $idConsultorio)
-            ->whereIn('estado', ['pendiente', 'confirmada'])
-            ->pluck('hora')
-            ->map(function ($hora) {
-                return Carbon::parse($hora)->format('H:i');
-            })
-            ->toArray();
+            // El campo blocks ya es un array gracias al cast en el modelo
+            $bloques = $horario->blocks;
 
-        // Procesar horarios disponibles
-        $horariosDisponibles = [];
+            if (empty($bloques)) {
+                throw new \Exception("El campo blocks está vacío");
+            }
 
-        foreach ($bloquesTrabajo as $bloque) {
-            try {
-                if (!isset($bloque['start']) || !isset($bloque['end'])) {
-                    continue;
-                }
+            if (!is_array($bloques)) {
+                throw new \Exception("El formato de bloques no es válido");
+            }
 
-                $start = Carbon::createFromFormat('H:i', $bloque['start']);
-                $end = Carbon::createFromFormat('H:i', $bloque['end']);
+            // Filtrar solo bloques de trabajo (work) y excluir descansos (break)
+            $bloquesTrabajo = array_filter($bloques, function ($bloque) {
+                return isset($bloque['type']) && $bloque['type'] === 'work';
+            });
 
-                // Generar intervalos de 30 minutos
-                $current = $start->copy();
-                while ($current < $end) {
-                    $horaFormato = $current->format('H:i');
-                    $horaFin = $current->copy()->addMinutes(30)->format('H:i');
+            // Obtener bloques de descanso para excluirlos
+            $bloquesDescanso = array_filter($bloques, function ($bloque) {
+                return isset($bloque['type']) && $bloque['type'] === 'break';
+            });
 
-                    if (!in_array($horaFormato, $citasAgendadas)) {
-                        $horariosDisponibles[] = [
-                            'start' => $horaFormato,
-                            'end' => $horaFin,
-                            'label' => $bloque['label'] ?? 'Disponible'
-                        ];
+            // Verificar citas ya agendadas
+            $citasAgendadas = Cita::where('fecha', $fecha)
+                ->where('id_consultorio', $idConsultorio)
+                ->whereIn('estado', ['pendiente', 'confirmada'])
+                ->pluck('hora')
+                ->map(function ($hora) {
+                    return Carbon::parse($hora)->format('H:i');
+                })
+                ->toArray();
+
+            // Procesar horarios disponibles
+            $horariosDisponibles = [];
+
+            foreach ($bloquesTrabajo as $bloque) {
+                try {
+                    if (!isset($bloque['start']) || !isset($bloque['end'])) {
+                        continue;
                     }
 
-                    $current->addMinutes(30);
+                    $start = Carbon::createFromFormat('H:i', $bloque['start']);
+                    $end = Carbon::createFromFormat('H:i', $bloque['end']);
+
+                    // Generar intervalos de 30 minutos
+                    $current = $start->copy();
+                    while ($current < $end) {
+                        $horaFormato = $current->format('H:i');
+                        $horaFin = $current->copy()->addMinutes(30)->format('H:i');
+
+                        // Verificar si el intervalo está dentro de un bloque de descanso
+                        $esHorarioDescanso = false;
+                        foreach ($bloquesDescanso as $descanso) {
+                            if (isset($descanso['start']) && isset($descanso['end'])) {
+                                $inicioDescanso = Carbon::createFromFormat('H:i', $descanso['start']);
+                                $finDescanso = Carbon::createFromFormat('H:i', $descanso['end']);
+
+                                if ($current->between($inicioDescanso, $finDescanso, false)) {
+                                    $esHorarioDescanso = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!$esHorarioDescanso && !in_array($horaFormato, $citasAgendadas)) {
+                            $horariosDisponibles[] = [
+                                'start' => $horaFormato,
+                                'end' => $horaFin,
+                                'label' => $bloque['label'] ?? 'Disponible'
+                            ];
+                        }
+
+                        $current->addMinutes(30);
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Error procesando bloque: " . $e->getMessage());
+                    continue;
                 }
-            } catch (\Exception $e) {
-                Log::error("Error procesando bloque: " . $e->getMessage());
-                continue;
             }
+
+
+            return response()->json([
+                'success' => true,
+                'horarios' => $horariosDisponibles,
+                'message' => count($horariosDisponibles) ? 'Horarios disponibles' : 'No hay horarios disponibles'
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error en obtenerHorariosDisponibles: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno al obtener horarios',
+                'error' => $e->getMessage(),
+                'horarios' => []
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'horarios' => $horariosDisponibles,
-            'message' => count($horariosDisponibles) ? 'Horarios disponibles' : 'No hay horarios disponibles'
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error("Error en obtenerHorariosDisponibles: " . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Error interno al obtener horarios',
-            'error' => $e->getMessage(),
-            'horarios' => []
-        ], 500);
     }
-}
 
     // Función auxiliar para validar formato de hora
     private function validarFormatoHora($hora)
