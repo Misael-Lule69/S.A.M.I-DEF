@@ -9,67 +9,47 @@
 
                 <div class="card-body">
                     @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                     @endif
 
                     <form id="form-cita" method="POST" action="{{ route('paciente.agendar-cita') }}">
                         @csrf
-                        
+
                         <div class="mb-3">
                             <label for="consultorio" class="form-label">Consultorio</label>
-                            <select class="form-select @error('consultorio') is-invalid @enderror" id="consultorio" name="consultorio" required>
+                            <select class="form-select" id="consultorio" name="consultorio" required>
                                 <option value="">Seleccione un consultorio</option>
                                 @foreach($consultorios as $consultorio)
-                                    <option value="{{ $consultorio->id }}" {{ old('consultorio') == $consultorio->id ? 'selected' : '' }}>
-                                        {{ $consultorio->nombre }}
-                                    </option>
+                                <option value="{{ $consultorio->id }}">{{ $consultorio->nombre }}</option>
                                 @endforeach
                             </select>
-                            @error('consultorio')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="fecha" class="form-label">Fecha</label>
-                            <input type="date" class="form-control @error('fecha') is-invalid @enderror" 
-                                   id="fecha" name="fecha" 
-                                   min="{{ date('Y-m-d') }}" 
-                                   value="{{ old('fecha') }}" required>
-                            @error('fecha')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input type="date" class="form-control" id="fecha" name="fecha"
+                                min="{{ date('Y-m-d') }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="hora" class="form-label">Hora</label>
-                            <select class="form-select @error('hora') is-invalid @enderror" 
-                                    id="hora" name="hora" required disabled>
-                                <option value="">Primero seleccione fecha y consultorio</option>
+                            <select class="form-select" id="hora" name="hora" required disabled>
+                                <option value="">Seleccione una hora</option>
                             </select>
-                            @error('hora')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="motivo" class="form-label">Motivo de la consulta</label>
-                            <textarea class="form-control @error('motivo') is-invalid @enderror" 
-                                      id="motivo" name="motivo" rows="3" required>{{ old('motivo') }}</textarea>
-                            @error('motivo')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <textarea class="form-control" id="motivo" name="motivo" rows="3" required></textarea>
                         </div>
-                        
-                        <button type="submit" class="btn btn-primary" id="btn-submit">
-                            Agendar Cita
-                        </button>
+
+                        <button type="submit" id="btn-submit" class="btn btn-primary">Agendar Cita</button>
                     </form>
                 </div>
             </div>
@@ -78,96 +58,119 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const consultorioSelect = document.getElementById('consultorio');
-    const fechaInput = document.getElementById('fecha');
-    const horaSelect = document.getElementById('hora');
-    const btnSubmit = document.getElementById('btn-submit');
-    
-    // Función para cargar horarios
-    async function cargarHorarios() {
-        // Validar selección previa
-        if (!consultorioSelect.value || !fechaInput.value) {
-            horaSelect.innerHTML = '<option value="">Primero seleccione consultorio y fecha</option>';
-            horaSelect.disabled = true;
-            return;
-        }
-        
-        // Mostrar estado de carga
-        horaSelect.innerHTML = '<option value="">Cargando horarios...</option>';
-        horaSelect.disabled = true;
-        
-        try {
-            // Realizar petición al servidor
-            const response = await fetch(`/paciente/horarios-disponibles?fecha=${fechaInput.value}&consultorio=${consultorioSelect.value}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            
-            const data = await response.json();
-            
-            // Limpiar select
-            horaSelect.innerHTML = '<option value="">Seleccione una hora</option>';
-            
-            // Manejar respuesta
-            if (!data.success || !data.horarios || data.horarios.length === 0) {
-                horaSelect.innerHTML += `<option value="" disabled>${data.message || 'No hay horarios disponibles'}</option>`;
+    document.addEventListener('DOMContentLoaded', function() {
+        const consultorioSelect = document.getElementById('consultorio');
+        const fechaInput = document.getElementById('fecha');
+        const horaSelect = document.getElementById('hora');
+        const btnSubmit = document.getElementById('btn-submit');
+        const formCita = document.getElementById('form-cita');
+
+        // Función para cargar horarios
+        async function cargarHorarios() {
+            const consultorioSelect = document.getElementById('consultorio');
+            const fechaInput = document.getElementById('fecha');
+            const horaSelect = document.getElementById('hora');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            const fecha = fechaInput.value;
+            const consultorio = consultorioSelect.value;
+
+            // Validar selección previa
+            if (!fecha || !consultorio) {
+                horaSelect.innerHTML = '<option value="">Primero seleccione consultorio y fecha</option>';
                 horaSelect.disabled = true;
+                btnSubmit.disabled = true;
                 return;
             }
-            
-            // Llenar con horarios disponibles
-            data.horarios.forEach(horario => {
-                const option = document.createElement('option');
-                option.value = horario.start;
-                
-                // Formatear horas para mostrar (09:00 AM - 09:30 AM)
-                const startTime = formatHoraAMPM(horario.start);
-                const endTime = formatHoraAMPM(horario.end);
-                
-                option.textContent = `${startTime} - ${endTime} (${horario.label})`;
-                horaSelect.appendChild(option);
-            });
-            
-            horaSelect.disabled = false;
-            
-        } catch (error) {
-            console.error('Error al cargar horarios:', error);
-            horaSelect.innerHTML = '<option value="">Error al cargar horarios. Intente nuevamente.</option>';
+
+            // Mostrar estado de carga
+            horaSelect.innerHTML = '<option value="">Cargando horarios...</option>';
             horaSelect.disabled = true;
+            btnSubmit.disabled = true;
+
+            try {
+                const response = await fetch(`/paciente/horarios-disponibles?fecha=${fecha}&consultorio=${consultorio}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Error en la respuesta del servidor');
+                }
+
+                console.log('Respuesta del servidor:', data);
+
+                // Limpiar select
+                horaSelect.innerHTML = '<option value="">Seleccione una hora</option>';
+
+                if (!data.success || !data.horarios || data.horarios.length === 0) {
+                    const mensaje = data.message || 'No hay horarios disponibles';
+                    horaSelect.innerHTML += `<option value="" disabled>${mensaje}</option>`;
+                    return;
+                }
+
+                // Llenar con horarios disponibles
+                data.horarios.forEach(horario => {
+                    const option = document.createElement('option');
+                    option.value = horario.start;
+
+                    const startTime = formatHoraAMPM(horario.start);
+                    const endTime = formatHoraAMPM(horario.end);
+
+                    option.textContent = `${startTime} - ${endTime}`;
+                    if (horario.label) {
+                        option.textContent += ` (${horario.label})`;
+                    }
+
+                    horaSelect.appendChild(option);
+                });
+
+                horaSelect.disabled = false;
+                btnSubmit.disabled = false;
+
+            } catch (error) {
+                console.error('Error al cargar horarios:', error);
+                horaSelect.innerHTML = `<option value="">Error: ${error.message}</option>`;
+                horaSelect.disabled = true;
+                btnSubmit.disabled = true;
+            }
         }
-    }
-    
-    // Función para formatear hora a AM/PM
-    function formatHoraAMPM(hora24) {
-        const [hours, minutes] = hora24.split(':');
-        const period = hours >= 12 ? 'PM' : 'AM';
-        const hours12 = hours % 12 || 12;
-        return `${hours12}:${minutes} ${period}`;
-    }
-    
-    // Event listeners
-    fechaInput.addEventListener('change', cargarHorarios);
-    consultorioSelect.addEventListener('change', cargarHorarios);
-    
-    // Manejar envío del formulario
-    document.getElementById('form-cita').addEventListener('submit', function(e) {
-        if (!horaSelect.value || horaSelect.disabled) {
-            e.preventDefault();
-            alert('Por favor seleccione un horario válido');
-            return;
+
+        function formatHoraAMPM(hora24) {
+            const [hours, minutes] = hora24.split(':');
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const hours12 = hours % 12 || 12;
+            return `${hours12}:${minutes} ${period}`;
         }
-        
-        // Mostrar indicador de carga
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Agendando...';
+
+        // Función para formatear hora a AM/PM
+        function formatHoraAMPM(hora24) {
+            const [hours, minutes] = hora24.split(':');
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const hours12 = hours % 12 || 12;
+            return `${hours12}:${minutes} ${period}`;
+        }
+
+        // Event listeners
+        fechaInput.addEventListener('change', cargarHorarios);
+        consultorioSelect.addEventListener('change', cargarHorarios);
+
+        // Manejar envío del formulario
+        formCita.addEventListener('submit', function(e) {
+            if (!horaSelect.value || horaSelect.disabled) {
+                e.preventDefault();
+                alert('Por favor seleccione un horario válido');
+                return;
+            }
+
+            // Mostrar indicador de carga
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Agendando...';
+        });
     });
-});
 </script>
 @endsection
