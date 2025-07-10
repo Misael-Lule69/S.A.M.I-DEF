@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -32,10 +35,12 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="fecha" class="form-label">Fecha</label>
-                            <input type="date" class="form-control" id="fecha" name="fecha"
-                                min="{{ date('Y-m-d') }}" required>
-                        </div>
+    <label for="fecha" class="form-label " >Fecha</label>
+    <input type="text" id="fecha" name="fecha"
+           class="form-control border-2 shadow-sm"
+           style="border-color: #6C5CE7; color: #6C5CE7;" required>
+</div>
+
 
                         <div class="mb-3">
                             <label for="hora" class="form-label">Hora</label>
@@ -173,4 +178,21 @@
         });
     });
 </script>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#fecha", {
+            altInput: true,
+            altFormat: "F j, Y",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            locale: "es", // Opcional: para español
+            theme: "light"
+        });
+    });
+</script>
+
 @endsection
