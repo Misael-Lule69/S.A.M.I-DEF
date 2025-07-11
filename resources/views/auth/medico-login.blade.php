@@ -23,7 +23,7 @@
         padding: 40px;
         box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 700px;
+        max-width: 701px;
         text-align: center;
     }
 
