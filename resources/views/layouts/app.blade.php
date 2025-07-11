@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +20,7 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    
+
     <style>
         /* Estilos generales del sidebar */
         .sidebar {
@@ -223,12 +224,12 @@
                 left: 50%;
                 transform: translateX(-50%);
             }
-            
+
             .navbar-toggler {
                 order: -1;
                 margin-right: auto;
             }
-            
+
             .navbar-nav-container {
                 width: 100%;
                 justify-content: flex-end;
@@ -241,7 +242,7 @@
                 margin-left: 0;
                 padding-left: 0;
             }
-            
+
             .navbar-logo-img {
                 width: 40px;
                 height: 40px;
@@ -261,7 +262,7 @@
             display: none;
         }
 
-        .sidebar.show + .sidebar-overlay {
+        .sidebar.show+.sidebar-overlay {
             display: block;
         }
 
@@ -273,6 +274,7 @@
 
     @stack('styles')
 </head>
+
 <body>
     <div id="app">
         @unless(Request::is('login') || Request::is('register') || Request::is('medico/login') || Request::is('password/reset*') || Request::is('password/email'))
@@ -284,33 +286,33 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 @endif
-                
+
                 <!-- Logo y texto - siempre visible -->
                 <a href="{{ Auth::guard('medico')->check() ? url('/home') : (Auth::check() ? url('/paciente/dashboard') : url('/')) }}" class="navbar-brand-container">
                     <img src="{{ asset('images/logo1.png') }}" alt="Logo SAMI" class="navbar-logo-img">
                     <span class="navbar-brand-text">SAMI</span>
                 </a>
 
-        <!-- Menú de navegación derecho -->
-        <div class="navbar-nav-container">
-            <ul class="navbar-nav">
-                @guest
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
-                    </a>
-                </li>
-                <li class="nav-item ms-2">
-                    <a class="btn btn-primary" href="{{ route('register') }}">
-                        <i class="bi bi-person-plus me-1"></i> Registrarse
-                    </a>
-                </li>
-                @endguest
-            </ul>
-        </div>
-    </div>
-</nav>
-        
+                <!-- Menú de navegación derecho -->
+                <div class="navbar-nav-container">
+                    <ul class="navbar-nav">
+                        @guest
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-primary" href="{{ route('register') }}">
+                                <i class="bi bi-person-plus me-1"></i> Registrarse
+                            </a>
+                        </li>
+                        @endguest
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
         @endunless
 
         @if(Request::is('login') || Request::is('register') || Request::is('medico/login') || Request::is('password/reset*') || Request::is('password/email'))
@@ -327,15 +329,15 @@
                 <div class="logo">SAMI</div>
                 <ul class="nav-menu">
                     @if(Auth::guard('medico')->check())
-    <!-- Menú para médico -->
-    <li class="{{ request()->is('home') ? 'active' : '' }}">
-        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i> Inicio</a>
-    </li>
+                    <!-- Menú para médico -->
+                    <li class="{{ request()->is('home') ? 'active' : '' }}">
+                        <a href="{{ url('/home') }}"><i class="bi bi-house-door"></i> Inicio</a>
+                    </li>
                     <li class="{{ request()->is('horarios') ? 'active' : '' }}">
                         <a href="{{ route('horarios') }}"><i class="bi bi-calendar3"></i> Horarios</a>
                     </li>
                     <li class="{{ request()->is('citas') ? 'active' : '' }}">
-                        <a href="#"><i class="bi bi-clipboard2-pulse"></i> Citas</a>
+                        <a href="{{ route('citas') }}"><i class="bi bi-clipboard2-pulse"></i> Citas</a>
                     </li>
                     <li class="{{ request()->is('expedientes') ? 'active' : '' }}">
                         <a href="{{ route('expedientes.index') }}"><i class="bi bi-folder"></i> Expedientes</a>
@@ -392,13 +394,13 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Función para mostrar/ocultar el sidebar en móviles
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('show');
-            
+
             const overlay = document.getElementById('sidebarOverlay');
             if (sidebar.classList.contains('show')) {
                 overlay.style.display = 'block';
@@ -442,4 +444,5 @@
     </script>
     @yield('scripts')
 </body>
+
 </html>
