@@ -36,8 +36,8 @@ class Cita extends Model
         return $this->belongsTo(Consultorio::class, 'id_consultorio');
     }
     
-    /*public function expediente()
+    public function expediente()
     {
         return $this->hasOne(ExpedienteClinico::class, 'id_cita');
-    }*/
+    }
 }

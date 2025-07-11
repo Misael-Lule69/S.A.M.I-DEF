@@ -338,7 +338,7 @@
                         <a href="#"><i class="bi bi-clipboard2-pulse"></i> Citas</a>
                     </li>
                     <li class="{{ request()->is('expedientes') ? 'active' : '' }}">
-                        <a href="#"><i class="bi bi-folder"></i> Expedientes</a>
+                        <a href="{{ route('expedientes.index') }}"><i class="bi bi-folder"></i> Expedientes</a>
                     </li>
                     @else
                     <!-- Menú para paciente -->

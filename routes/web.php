@@ -73,4 +73,25 @@ Route::middleware(['auth:medico'])->group(function () {
             ], 500);
         }
     });
+
+    // Rutas de expedientes clínicos
+    Route::prefix('expedientes')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'index'])->name('expedientes.index');
+        Route::get('/crear', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'create'])->name('expedientes.create');
+        Route::post('/', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'store'])->name('expedientes.store');
+        Route::get('/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'show'])->name('expedientes.show');
+        Route::get('/{id}/editar', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'edit'])->name('expedientes.edit');
+        Route::put('/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'update'])->name('expedientes.update');
+        Route::delete('/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'destroy'])->name('expedientes.destroy');
+        
+        // Rutas para búsqueda AJAX
+        Route::get('/buscar-pacientes', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'buscarPacientes'])->name('expedientes.buscar-pacientes');
+        Route::get('/buscar-citas', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'buscarCitas'])->name('expedientes.buscar-citas');
+        Route::get('/paciente/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'obtenerPaciente'])->name('expedientes.obtener-paciente');
+        Route::get('/expedientes-paciente/{idPaciente}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'expedientesPaciente'])->name('expedientes.expedientes-paciente');
+        
+        // Rutas para gestión de pacientes
+        Route::put('/pacientes/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'actualizarPaciente'])->name('pacientes.update');
+        Route::delete('/pacientes/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'eliminarPaciente'])->name('pacientes.destroy');
+    });
 });
