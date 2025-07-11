@@ -91,6 +91,15 @@
         .login-container {
             flex-direction: column;
         }
+         /* Añade estas líneas para cambiar el orden */
+        .login-container > div:first-child {
+            order: 2; /* El formulario pasa a segunda posición */
+        }
+        
+        .login-container > div:last-child {
+            order: 1; /* La imagen pasa a primera posición */
+            margin-bottom: 30px; /* Espacio entre imagen y formulario */
+        }
 
         .doctor-image {
             width: 200px;
