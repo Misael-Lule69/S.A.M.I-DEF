@@ -8,6 +8,7 @@ use App\Models\ExpedienteClinico;
 use App\Models\Cita;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExpedientesController extends Controller
 {
@@ -308,5 +309,28 @@ class ExpedientesController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al eliminar el paciente: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function generarPDF($id)
+    {
+        $expediente = ExpedienteClinico::with('cita.paciente')->findOrFail($id);
+        
+        // Generar el PDF
+        $pdf = Pdf::loadView('expedientes.pdf', compact('expediente'));
+        
+        // Configurar el PDF
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'Arial'
+        ]);
+        
+        // Generar nombre del archivo
+        $nombreArchivo = 'Expediente_' . $expediente->nombre_paciente . '_' . $expediente->fecha_elaboracion . '.pdf';
+        $nombreArchivo = str_replace([' ', '/'], ['_', '-'], $nombreArchivo);
+        
+        // Descargar el PDF
+        return $pdf->download($nombreArchivo);
     }
 } 

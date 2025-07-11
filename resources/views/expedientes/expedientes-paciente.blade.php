@@ -70,6 +70,10 @@
                                                        class="btn btn-sm btn-info" title="Ver">
                                                         <i class="fas fa-eye"></i> Ver
                                                     </a>
+                                                    <a href="{{ route('expedientes.pdf', $expediente->id) }}" 
+                                                       class="btn btn-sm btn-success" title="Generar PDF" target="_blank">
+                                                        <i class="fas fa-file-pdf"></i> PDF
+                                                    </a>
                                                     <a href="{{ route('expedientes.edit', $expediente->id) }}" 
                                                        class="btn btn-sm btn-warning" title="Editar">
                                                         <i class="fas fa-edit"></i> Editar

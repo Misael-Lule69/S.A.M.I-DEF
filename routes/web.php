@@ -93,5 +93,8 @@ Route::middleware(['auth:medico'])->group(function () {
         // Rutas para gestión de pacientes
         Route::put('/pacientes/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'actualizarPaciente'])->name('pacientes.update');
         Route::delete('/pacientes/{id}', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'eliminarPaciente'])->name('pacientes.destroy');
+        
+        // Ruta para generar PDF
+        Route::get('/expediente/{id}/pdf', [\App\Http\Controllers\Expedientes\ExpedientesController::class, 'generarPDF'])->name('expedientes.pdf');
     });
 });
