@@ -23,7 +23,7 @@
         padding: 40px;
         box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 700px;
+        max-width: 701px;
         text-align: center;
     }
 
@@ -90,6 +90,15 @@
     @media (max-width: 768px) {
         .login-container {
             flex-direction: column;
+        }
+         /* Añade estas líneas para cambiar el orden */
+        .login-container > div:first-child {
+            order: 2; /* El formulario pasa a segunda posición */
+        }
+        
+        .login-container > div:last-child {
+            order: 1; /* La imagen pasa a primera posición */
+            margin-bottom: 30px; /* Espacio entre imagen y formulario */
         }
 
         .doctor-image {

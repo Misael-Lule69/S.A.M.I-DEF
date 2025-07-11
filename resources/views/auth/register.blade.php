@@ -91,6 +91,14 @@
         .register-container {
             flex-direction: column;
         }
+        register-box{
+            order:1;
+        }
+
+         .register-container> div:last-child {
+            order: -1; /* Imagen va primero (valor negativo) */
+            margin-bottom: 30px; /* Espacio entre imagen y formulario */
+        }
 
         .doctor-image {
             width: 200px;
