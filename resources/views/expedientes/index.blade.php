@@ -58,59 +58,60 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($pacientes as $paciente)
-                                    <tr>
-                                        <td>{{ $paciente->id }}</td>
-                                        <td>
-                                            <strong>{{ $paciente->nombre }} {{ $paciente->apellido_paterno }} {{ $paciente->apellido_materno }}</strong>
-                                        </td>
-                                        <td>{{ $paciente->telefono }}</td>
-                                        <td>{{ $paciente->created_at ? $paciente->created_at->format('d/m/Y H:i') : 'N/A' }}</td>
-                                        <td>
-                                            @php
-                                                $expedientesCount = \App\Models\ExpedienteClinico::whereHas('cita', function($query) use ($paciente) {
-                                                    $query->where('id_paciente', $paciente->id);
-                                                })->count();
-                                            @endphp
-                                            <span class="badge bg-{{ $expedientesCount > 0 ? 'success' : 'secondary' }}">
-                                                {{ $expedientesCount }} expediente{{ $expedientesCount != 1 ? 's' : '' }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="{{ route('expedientes.expedientes-paciente', $paciente->id) }}" 
-                                                   class="btn btn-sm btn-info" title="Ver Expedientes">
-                                                    <i class="fas fa-folder-open"></i> Ver Expedientes
-                                                </a>
-                                                <a href="{{ route('expedientes.create') }}?paciente_id={{ $paciente->id }}" 
-                                                   class="btn btn-sm btn-success" title="Agregar Expediente">
-                                                    <i class="fas fa-plus-circle"></i> Agregar Expediente
-                                                </a>
-                                                <button type="button" class="btn btn-sm btn-warning" 
-                                                        onclick="editarPaciente({{ $paciente->id }})" title="Editar Paciente">
-                                                    <i class="fas fa-user-edit"></i> Editar
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-danger" 
-                                                        onclick="eliminarPaciente({{ $paciente->id }}, '{{ $paciente->nombre }}')" title="Eliminar Paciente">
-                                                    <i class="fas fa-user-times"></i> Eliminar
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">
-                                            <div class="alert alert-info">
-                                                <i class="fas fa-info-circle"></i>
-                                                No se encontraron pacientes.
-                                                @if($busqueda)
-                                                    <br>Intente con otros términos de búsqueda.
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
+    @forelse($pacientes as $paciente)
+        <tr>
+            <td data-label="ID">{{ $paciente->id }}</td>
+            <td data-label="Nombre Completo">
+                <strong>{{ $paciente->nombre }} {{ $paciente->apellido_paterno }} {{ $paciente->apellido_materno }}</strong>
+            </td>
+            <td data-label="Teléfono">{{ $paciente->telefono }}</td>
+            <td data-label="Fecha Registro">{{ $paciente->created_at ? $paciente->created_at->format('d/m/Y H:i') : 'N/A' }}</td>
+            <td data-label="Expedientes">
+                @php
+                    $expedientesCount = \App\Models\ExpedienteClinico::whereHas('cita', function($query) use ($paciente) {
+                        $query->where('id_paciente', $paciente->id);
+                    })->count();
+                @endphp
+                <span class="badge bg-{{ $expedientesCount > 0 ? 'success' : 'secondary' }}">
+                    {{ $expedientesCount }} expediente{{ $expedientesCount != 1 ? 's' : '' }}
+                </span>
+            </td>
+            <td data-label="Acciones">
+                <div class="btn-group" role="group">
+                    <a href="{{ route('expedientes.expedientes-paciente', $paciente->id) }}" 
+                       class="btn btn-sm btn-info" title="Ver Expedientes">
+                        <i class="fas fa-folder-open"></i> Ver Expedientes
+                    </a>
+                    <a href="{{ route('expedientes.create') }}?paciente_id={{ $paciente->id }}" 
+                       class="btn btn-sm btn-success" title="Agregar Expediente">
+                        <i class="fas fa-plus-circle"></i> Agregar Expediente
+                    </a>
+                    <button type="button" class="btn btn-sm btn-warning" 
+                            onclick="editarPaciente({{ $paciente->id }})" title="Editar Paciente">
+                        <i class="fas fa-user-edit"></i> Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" 
+                            onclick="eliminarPaciente({{ $paciente->id }}, '{{ $paciente->nombre }}')" title="Eliminar Paciente">
+                        <i class="fas fa-user-times"></i> Eliminar
+                    </button>
+                </div>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="6" class="text-center">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    No se encontraron pacientes.
+                    @if($busqueda)
+                        <br>Intente con otros términos de búsqueda.
+                    @endif
+                </div>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
+
                         </table>
                     </div>
 
@@ -165,51 +166,161 @@
 </div>
 
 <style>
-    .btn-group .btn {
-        margin-right: 2px;
-        font-size: 0.8rem;
-        padding: 0.25rem 0.5rem;
-    }
-    .table th {
-        white-space: nowrap;
-    }
-    .alert {
-        border-radius: 8px;
-    }
     .card {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         border: none;
         border-radius: 10px;
     }
+
     .card-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border-radius: 10px 10px 0 0 !important;
     }
+
+    .btn-group .btn {
+        margin-right: 2px;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .table th {
+        white-space: nowrap;
+    }
+
     .badge {
         font-size: 0.8em;
     }
+
     .btn i {
         margin-right: 3px;
     }
+
+    .alert {
+        border-radius: 8px;
+    }
+
     .input-group-text {
         background-color: #f8f9fa;
         border-color: #ced4da;
         color: #6c757d;
     }
+
     .input-group .form-control:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
+
     .input-group .btn-primary {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-color: #667eea;
     }
+
     .input-group .btn-primary:hover {
         background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
         border-color: #5a6fd8;
     }
+
+    /* Vista móvil */
+    @media (max-width: 768px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        tr {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        td::before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 40%; /* Menos ancho para la etiqueta */
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        color: white;
+        background-color: #212529;
+        padding: 4px 6px;
+        border-radius: 5px;
+        font-size: 12px;
+    }
+
+    td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 60%; /* Aumentamos este valor */
+        padding-right: 10px;
+        text-align: right;
+        font-size: 14px;
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    td[data-label="Nombre Completo"] {
+        font-weight: bold;
+        text-align: left;
+        padding-left: 60%;
+    }
+
+        td[data-label="Acciones"] {
+            padding-left: 10px;
+            padding-right: 10px;
+            text-align: center;
+        }
+
+        td[data-label="Acciones"]::before {
+            position: relative;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            background-color: #212529;
+            padding: 6px;
+            border-radius: 8px;
+            font-size: 13px;
+            width: 240px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        td[data-label="Acciones"] .btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        td[data-label="Acciones"] .btn-group .btn {
+            width: 100%;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        td[data-label="Acciones"] .btn-group .btn:last-child {
+            margin-bottom: 0;
+        }
+    }
 </style>
+
 
 <script>
 let pacienteActualId = null;

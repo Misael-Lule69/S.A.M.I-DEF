@@ -362,7 +362,7 @@
 
                         <!-- Botones de acción -->
                         <div class="row">
-                            <div class="col-12 text-center">
+                            <div class="col-12 text-center btn-group-mobile">
                                 <button type="submit" class="btn btn-primary btn-lg me-2">
                                     <i class="fas fa-save"></i> Actualizar Expediente
                                 </button>
@@ -399,5 +399,16 @@
     .border-bottom {
         border-color: #dee2e6 !important;
     }
+    @media (max-width: 768px) {
+  .btn-group-mobile > * {
+    display: block;       /* Que cada botón sea bloque (ocupe toda línea) */
+    margin-bottom: 12px;  /* Espacio abajo entre botones */
+    width: 100%;          /* Que el botón ocupe todo el ancho disponible */
+  }
+  .btn-group-mobile > *:last-child {
+    margin-bottom: 0;     /* Sin margen en el último botón */
+  }
+}
+
 </style>
 @endsection 
