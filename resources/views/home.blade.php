@@ -256,19 +256,27 @@
     }
 
     .event-pendiente {
-        background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+        background: linear-gradient(135deg, #e8d5ff 0%, #d4b5ff 100%);
+        color: #6a4c93;
+        border: 1px solid #c8a2c8;
     }
 
     .event-realizada {
-        background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #7b1fa2;
+        border: 1px solid #ce93d8;
     }
 
     .event-cancelada {
-        background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+        color: #c2185b;
+        border: 1px solid #f48fb1;
     }
 
     .event-confirmada {
-        background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1976d2;
+        border: 1px solid #90caf9;
     }
 
     .event-time {
@@ -487,7 +495,7 @@
                                 @foreach($dayCitas as $cita)
                                     <div class="calendar-event event-{{ $cita->estado }}" 
                                          title="{{ $cita->paciente ? $cita->paciente->nombre . ' ' . $cita->paciente->apellido_paterno : 'N/A' }} - {{ $cita->motivo }}">
-                                        <div class="event-time">{{ $cita->hora }}</div>
+                                        <div class="event-time">{{ \Carbon\Carbon::parse($cita->hora)->format('H:i') }}</div>
                                         <div class="event-patient">
                                             {{ $cita->paciente ? Str::limit($cita->paciente->nombre . ' ' . $cita->paciente->apellido_paterno, 15) : 'N/A' }}
                                         </div>
