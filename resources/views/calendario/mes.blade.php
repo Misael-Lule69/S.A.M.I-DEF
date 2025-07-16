@@ -2,64 +2,6 @@
 
 @section('content')
 <style>
-    .dashboard-card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-    
-    .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-    
-    .dashboard-card .card-body {
-        padding: 2rem;
-        text-align: center;
-    }
-    
-    .dashboard-card .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        opacity: 0.9;
-    }
-    
-    .dashboard-card .display-4 {
-        font-weight: 700;
-        margin: 0;
-        font-size: 2.5rem;
-    }
-    
-    .bg-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    }
-    
-    .bg-success {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
-    }
-    
-    .bg-info {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    }
-    
-    .welcome-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .welcome-section h3 {
-        margin: 0;
-        font-weight: 600;
-        font-size: 1.8rem;
-    }
-    
     .calendar-container {
         background: white;
         border-radius: 20px;
@@ -92,48 +34,24 @@
 
     .nav-btn {
         background: rgba(255,255,255,0.2);
-        border: 2px solid rgba(255,255,255,0.3);
+        border: none;
         color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 50px;
-        font-size: 1.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 1.2rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-weight: 600;
-        min-width: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .nav-btn:hover {
-        background: rgba(255,255,255,0.4);
-        border-color: rgba(255,255,255,0.6);
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-
-    .nav-btn i {
-        transition: all 0.3s ease;
-    }
-
-    .nav-btn:hover i {
-        transform: scale(1.2);
+        background: rgba(255,255,255,0.3);
+        transform: scale(1.05);
     }
 
     .current-month {
         font-size: 1.5rem;
         font-weight: 600;
-        min-width: 250px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-    .current-month i {
-        font-size: 1.3rem;
-        opacity: 0.9;
+        min-width: 200px;
     }
 
     .view-toggle {
@@ -145,30 +63,24 @@
 
     .view-btn {
         background: rgba(255,255,255,0.2);
-        border: 2px solid rgba(255,255,255,0.3);
+        border: none;
         color: white;
-        padding: 0.75rem 1.5rem;
+        padding: 0.5rem 1.5rem;
         border-radius: 25px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
-        font-size: 0.9rem;
     }
 
     .view-btn:hover {
-        background: rgba(255,255,255,0.4);
-        border-color: rgba(255,255,255,0.6);
+        background: rgba(255,255,255,0.3);
         color: white;
         text-decoration: none;
-        transform: scale(1.05);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
     .view-btn.active {
-        background: rgba(255,255,255,0.5);
-        border-color: rgba(255,255,255,0.8);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        background: rgba(255,255,255,0.4);
     }
 
     .calendar-grid {
@@ -313,32 +225,8 @@
         color: #6c757d;
         font-weight: 600;
     }
-    
-    .stats-row {
-        margin-bottom: 2rem;
-    }
-    
-    .container {
-        max-width: 1200px;
-    }
-    
+
     @media (max-width: 768px) {
-        .dashboard-card .card-body {
-            padding: 1.5rem;
-        }
-        
-        .dashboard-card .display-4 {
-            font-size: 2rem;
-        }
-        
-        .welcome-section {
-            padding: 1.5rem;
-        }
-        
-        .welcome-section h3 {
-            font-size: 1.5rem;
-        }
-        
         .calendar-day {
             min-height: 80px;
             padding: 0.25rem;
@@ -366,41 +254,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <!-- Sección de Bienvenida -->
-            <div class="welcome-section">
-                <h3>👋 Bienvenido(a) de vuelta, {{ Auth::user()->name }}</h3>
-                <p class="mb-0 mt-2" style="opacity: 0.9;">Aquí tienes un resumen de tus citas médicas</p>
-            </div>
-
-            <!-- Cards de Estadísticas -->
-            <div class="row stats-row">
-                <div class="col-md-4 mb-3">
-                    <div class="card dashboard-card text-white bg-primary">
-                        <div class="card-body">
-                            <h5 class="card-title">📅 Citas Hoy</h5>
-                            <p class="card-text display-4">{{ $citasHoy }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card dashboard-card text-white bg-success">
-                        <div class="card-body">
-                            <h5 class="card-title">⏳ Pendientes</h5>
-                            <p class="card-text display-4">{{ $citasPendientes }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card dashboard-card text-white bg-info">
-                        <div class="card-body">
-                            <h5 class="card-title">✅ Completadas</h5>
-                            <p class="card-text display-4">{{ $citasRealizadas }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Barra de Estadísticas del Mes -->
+            <!-- Barra de Estadísticas -->
             <div class="stats-bar">
                 <h5 class="mb-3">📊 Estadísticas del Mes</h5>
                 <div class="stats-grid">
@@ -423,32 +277,26 @@
                 </div>
             </div>
 
-            <!-- Calendario Mensual -->
+            <!-- Calendario -->
             <div class="calendar-container">
                 <div class="calendar-header">
                     <h1 class="calendar-title">📅 Calendario de Citas</h1>
                     
                     <div class="calendar-actions">
-                        <button class="nav-btn" onclick="changeMonth(-1)" title="Mes anterior (←)">
-                            <i class="fas fa-arrow-circle-left"></i>
+                        <button class="nav-btn" onclick="changeMonth(-1)">
+                            <i class="fas fa-chevron-left"></i>
                         </button>
                         <span class="current-month" id="currentMonth">
-                            <i class="fas fa-calendar-alt me-2"></i>{{ $fecha->format('F Y') }}
+                            {{ $fecha->format('F Y') }}
                         </span>
-                        <button class="nav-btn" onclick="changeMonth(1)" title="Mes siguiente (→)">
-                            <i class="fas fa-arrow-circle-right"></i>
+                        <button class="nav-btn" onclick="changeMonth(1)">
+                            <i class="fas fa-chevron-right"></i>
                         </button>
-                    </div>
-                    
-                    <div class="text-center mt-2" style="opacity: 0.8; font-size: 0.8rem;">
-                        <i class="fas fa-keyboard me-1"></i>
-                        Usa las flechas ← → para navegar o la tecla Home para ir al mes actual
                     </div>
                     
                     <div class="view-toggle">
-                        <button class="view-btn active" onclick="goToCurrentMonth()" title="Ir al mes actual (Home)">
-                            <i class="fas fa-home me-2"></i>Mes Actual
-                        </button>
+                        <a href="{{ route('calendario.mes', ['mes' => $fecha->month, 'anio' => $fecha->year]) }}" 
+                           class="view-btn active">📅 Calendario Mensual</a>
                     </div>
                 </div>
                 
@@ -522,42 +370,9 @@ function changeMonth(direction) {
         anio--;
     }
     
-    // Construir la nueva URL
-    const baseUrl = window.location.pathname.split('/').slice(0, -2).join('/') + '/home';
-    const newUrl = `${baseUrl}?mes=${mes}&anio=${anio}`;
-    window.location.href = newUrl;
+    currentUrl.searchParams.set('mes', mes);
+    currentUrl.searchParams.set('anio', anio);
+    window.location.href = currentUrl.toString();
 }
-
-function goToCurrentMonth() {
-    const today = new Date();
-    const currentMonth = today.getMonth() + 1; // getMonth() devuelve 0-11
-    const currentYear = today.getFullYear();
-    
-    // Construir la nueva URL
-    const baseUrl = window.location.pathname.split('/').slice(0, -2).join('/') + '/home';
-    const newUrl = `${baseUrl}?mes=${currentMonth}&anio=${currentYear}`;
-    window.location.href = newUrl;
-}
-
-// Agregar navegación con teclado
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'ArrowLeft') {
-        changeMonth(-1);
-    } else if (event.key === 'ArrowRight') {
-        changeMonth(1);
-    } else if (event.key === 'Home') {
-        goToCurrentMonth();
-    }
-});
 </script>
-
-@if (session('status'))
-    <div class="alert alert-success alert-dismissible fade show position-fixed" 
-         style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;" 
-         role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        {{ session('status') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-@endsection
+@endsection 

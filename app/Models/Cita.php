@@ -28,12 +28,12 @@ class Cita extends Model
     
     public function paciente()
     {
-        return $this->belongsTo(Paciente::class, 'id_paciente');
+        return $this->belongsTo(Paciente::class, 'id_paciente', 'id');
     }
     
     public function consultorio()
     {
-        return $this->belongsTo(Consultorio::class, 'id_consultorio');
+        return $this->belongsTo(Consultorio::class, 'id_consultorio', 'id');
     }
     
     public function expediente()

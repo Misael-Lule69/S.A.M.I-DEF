@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\MedicoLoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\CalendarioController;
 
 // Rutas de autenticación para pacientes (con registro)
 Auth::routes(['register' => true]);
@@ -53,6 +54,13 @@ Route::middleware(['auth:medico'])->group(function () {
 
     // Ruta home (solo médico)
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home/{mes?}/{anio?}', [HomeController::class, 'index'])->name('home.calendar');
+
+    // Rutas de calendario
+    Route::prefix('calendario')->group(function () {
+        Route::get('/', [CalendarioController::class, 'index'])->name('calendario');
+        Route::get('/mes', [CalendarioController::class, 'mes'])->name('calendario.mes');
+    });
 
     // Rutas de horarios (solo médico)
     Route::prefix('horarios')->group(function () {
