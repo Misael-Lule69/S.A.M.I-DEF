@@ -97,22 +97,10 @@ class ExpedientesController extends Controller
                 ->withInput();
         }
 
-        // Crear una cita automática para el expediente
-        $cita = new Cita();
-        $cita->id_paciente = $request->id_paciente;
-        $cita->id_consultorio = 1; // Consultorio por defecto
-        $cita->fecha = Carbon::now()->toDateString();
-        $cita->hora = Carbon::now()->toTimeString();
-        $cita->motivo = 'Consulta para expediente clínico';
-        $cita->estado = 'realizada'; // Usar un valor válido del ENUM
-        $cita->confirmada = true;
-        $cita->confirmacion_enviada = true;
-        $cita->save();
-
+        // Guardar expediente sin crear cita
         $expediente = new ExpedienteClinico($request->all());
-        $expediente->id_cita = $cita->id;
-        $expediente->fecha_elaboracion = Carbon::now()->toDateString();
-        $expediente->hora_elaboracion = Carbon::now()->toTimeString();
+        $expediente->fecha_elaboracion = \Carbon\Carbon::now()->toDateString();
+        $expediente->hora_elaboracion = \Carbon\Carbon::now()->toTimeString();
         $expediente->save();
 
         return redirect()->route('expedientes.index')
@@ -138,7 +126,6 @@ class ExpedientesController extends Controller
         $expediente = ExpedienteClinico::findOrFail($id);
         
         $validator = Validator::make($request->all(), [
-            'id_cita' => 'required|exists:citas,id',
             'tipo_interrogatorio' => 'required|string|max:255',
             'nombre_paciente' => 'required|string|max:255',
             'edad' => 'required|integer|min:0|max:150',
@@ -187,18 +174,6 @@ class ExpedientesController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
-        }
-
-        // Verificar que no exista otro expediente para la nueva cita (si cambió)
-        if ($request->id_cita != $expediente->id_cita) {
-            $expedienteExistente = ExpedienteClinico::where('id_cita', $request->id_cita)
-                ->where('id', '!=', $id)
-                ->first();
-            if ($expedienteExistente) {
-                return redirect()->back()
-                    ->with('error', 'Ya existe un expediente clínico para esta cita.')
-                    ->withInput();
-            }
         }
 
         $expediente->update($request->all());

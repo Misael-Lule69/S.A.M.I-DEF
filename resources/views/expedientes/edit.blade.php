@@ -3,12 +3,12 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Editar Expediente Clínico #{{ $expediente->id }}</h4>
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-4 mt-4 mb-4">
+                <div class="card-header bg-gradient-primary text-white rounded-top-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h4 class="mb-0"><i class="fas fa-file-medical"></i> Editar Expediente Clínico #{{ $expediente->id }}</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     @if($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <ul class="mb-0">
@@ -34,17 +34,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="id_cita" class="form-label">Cita *</label>
-                                <select name="id_cita" id="id_cita" class="form-select" required>
-                                    <option value="">Seleccione una cita...</option>
-                                    @foreach($citas as $cita)
-                                        <option value="{{ $cita->id }}" {{ $expediente->id_cita == $cita->id ? 'selected' : '' }}>
-                                            Cita #{{ $cita->id }} - {{ $cita->fecha }} {{ $cita->hora }} - {{ $cita->motivo }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <!-- Eliminado campo de cita -->
                             <div class="col-md-6">
                                 <label for="tipo_interrogatorio" class="form-label">Tipo de Interrogatorio *</label>
                                 <input type="text" name="tipo_interrogatorio" id="tipo_interrogatorio" 
@@ -159,8 +149,12 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="padecimiento_actual" class="form-label">Padecimiento Actual *</label>
-                                <textarea name="padecimiento_actual" id="padecimiento_actual" 
-                                          class="form-control" rows="4" required>{{ old('padecimiento_actual', $expediente->padecimiento_actual) }}</textarea>
+                                <div class="input-group mb-2">
+                                    <textarea name="padecimiento_actual" id="padecimiento_actual" 
+                                              class="form-control" rows="4" required>{{ old('padecimiento_actual', $expediente->padecimiento_actual) }}</textarea>
+                                    <button type="button" class="btn btn-outline-danger" onclick="document.getElementById('padecimiento_actual').value = ''">Limpiar</button>
+                                </div>
+                                <small class="text-muted">Puedes limpiar y volver a llenar este campo para cada consulta subsecuente.</small>
                             </div>
                         </div>
 
@@ -338,6 +332,13 @@
                                           class="form-control" rows="4">{{ old('resultados_laboratorio', $expediente->resultados_laboratorio) }}</textarea>
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="estudios_gabinete" class="form-label">Estudios de Gabinete</label>
+                                <textarea name="estudios_gabinete" id="estudios_gabinete" 
+                                          class="form-control" rows="4">{{ old('estudios_gabinete', $expediente->estudios_gabinete ?? '') }}</textarea>
+                            </div>
+                        </div>
 
                         <div class="row mb-3">
                             <div class="col-md-12">
@@ -383,32 +384,85 @@
 
 <style>
     .card {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 6px 24px rgba(102, 126, 234, 0.10), 0 1.5px 4px rgba(118, 75, 162, 0.08);
         border: none;
-        border-radius: 10px;
+        border-radius: 1.5rem;
     }
     .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 10px 10px 0 0 !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: #fff !important;
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.10);
     }
     .form-label {
         font-weight: 600;
-        color: #495057;
+        color: #4B3869;
+        letter-spacing: 0.5px;
+    }
+    .form-control, .form-select, textarea {
+        border-radius: 0.75rem;
+        border: 1.5px solid #d1d5db;
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.15);
+    }
+    .input-group .btn {
+        border-radius: 0.75rem;
+    }
+    .section-title {
+        font-size: 1.15rem;
+        color: #764ba2;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
     }
     .border-bottom {
         border-color: #dee2e6 !important;
     }
-    @media (max-width: 768px) {
-  .btn-group-mobile > * {
-    display: block;       /* Que cada botón sea bloque (ocupe toda línea) */
-    margin-bottom: 12px;  /* Espacio abajo entre botones */
-    width: 100%;          /* Que el botón ocupe todo el ancho disponible */
-  }
-  .btn-group-mobile > *:last-child {
-    margin-bottom: 0;     /* Sin margen en el último botón */
-  }
-}
-
+    .btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger {
+        border-radius: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .btn-lg {
+        padding: 0.7rem 2.2rem;
+        font-size: 1.1rem;
+    }
+    @media (max-width: 991.98px) {
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+        }
+    }
+    @media (max-width: 767.98px) {
+        .card {
+            border-radius: 0.5rem;
+        }
+        .card-header {
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+        .btn-group-mobile > * {
+            display: block;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+        .btn-group-mobile > *:last-child {
+            margin-bottom: 0;
+        }
+    }
+    .input-group.mb-2 > textarea.form-control {
+        min-height: 90px;
+    }
+    .row.mb-3, .row.mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
+    .alert {
+        border-radius: 0.75rem;
+    }
 </style>
 @endsection 

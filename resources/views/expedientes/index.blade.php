@@ -71,6 +71,9 @@
                     $expedientesCount = \App\Models\ExpedienteClinico::whereHas('cita', function($query) use ($paciente) {
                         $query->where('id_paciente', $paciente->id);
                     })->count();
+                    $ultimoExpediente = \App\Models\ExpedienteClinico::whereHas('cita', function($query) use ($paciente) {
+                        $query->where('id_paciente', $paciente->id);
+                    })->orderBy('fecha_elaboracion', 'desc')->first();
                 @endphp
                 <span class="badge bg-{{ $expedientesCount > 0 ? 'success' : 'secondary' }}">
                     {{ $expedientesCount }} expediente{{ $expedientesCount != 1 ? 's' : '' }}
@@ -82,10 +85,17 @@
                        class="btn btn-sm btn-info" title="Ver Expedientes">
                         <i class="fas fa-folder-open"></i> Ver Expedientes
                     </a>
-                    <a href="{{ route('expedientes.create') }}?paciente_id={{ $paciente->id }}" 
-                       class="btn btn-sm btn-success" title="Agregar Expediente">
-                        <i class="fas fa-plus-circle"></i> Agregar Expediente
-                    </a>
+                    @if($expedientesCount == 0)
+                        <a href="{{ route('expedientes.create') }}?paciente_id={{ $paciente->id }}" 
+                           class="btn btn-sm btn-success" title="Agregar Expediente">
+                            <i class="fas fa-plus-circle"></i> Agregar Expediente
+                        </a>
+                    @else
+                        <a href="{{ route('expedientes.edit', $ultimoExpediente->id) }}" 
+                           class="btn btn-sm btn-warning" title="Actualizar Expediente">
+                            <i class="fas fa-edit"></i> Actualizar Expediente
+                        </a>
+                    @endif
                     <button type="button" class="btn btn-sm btn-warning" 
                             onclick="editarPaciente({{ $paciente->id }})" title="Editar Paciente">
                         <i class="fas fa-user-edit"></i> Editar

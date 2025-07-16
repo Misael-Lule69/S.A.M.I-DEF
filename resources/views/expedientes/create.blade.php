@@ -23,6 +23,7 @@
                     <form method="POST" action="{{ route('expedientes.store') }}" id="expedienteForm">
                         @csrf
                         
+                        <!-- Eliminado campo de cita, solo se muestran los datos del paciente y expediente -->
                         <!-- Sección de Identificación -->
                         <div class="row mb-4">
                             <div class="col-12">
