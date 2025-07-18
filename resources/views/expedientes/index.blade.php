@@ -68,12 +68,8 @@
             <td data-label="Fecha Registro">{{ $paciente->created_at ? $paciente->created_at->format('d/m/Y H:i') : 'N/A' }}</td>
             <td data-label="Expedientes">
                 @php
-                    $expedientesCount = \App\Models\ExpedienteClinico::whereHas('cita', function($query) use ($paciente) {
-                        $query->where('id_paciente', $paciente->id);
-                    })->count();
-                    $ultimoExpediente = \App\Models\ExpedienteClinico::whereHas('cita', function($query) use ($paciente) {
-                        $query->where('id_paciente', $paciente->id);
-                    })->orderBy('fecha_elaboracion', 'desc')->first();
+                    $expedientesCount = \App\Models\ExpedienteClinico::where('id_paciente', $paciente->id)->count();
+                    $ultimoExpediente = \App\Models\ExpedienteClinico::where('id_paciente', $paciente->id)->orderBy('fecha_elaboracion', 'desc')->first();
                 @endphp
                 <span class="badge bg-{{ $expedientesCount > 0 ? 'success' : 'secondary' }}">
                     {{ $expedientesCount }} expediente{{ $expedientesCount != 1 ? 's' : '' }}

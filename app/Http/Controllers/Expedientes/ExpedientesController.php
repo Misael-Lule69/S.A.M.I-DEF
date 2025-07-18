@@ -68,7 +68,7 @@ class ExpedientesController extends Controller
             'interrogatorio_gastrointestinal' => 'nullable|string',
             'interrogatorio_genitourinario' => 'nullable|string',
             'interrogatorio_hematolinfatico' => 'nullable|string',
-            'interrogatorio_nervioso' => 'nullable|string',
+            'interrogatorio_nervoso' => 'nullable|string',
             'interrogatorio_musculo_esqueletico' => 'nullable|string',
             'interrogatorio_piel_mucosas' => 'nullable|string',
             'signos_ta' => 'nullable|string|max:10',
@@ -86,6 +86,7 @@ class ExpedientesController extends Controller
             'exploracion_extremidades' => 'nullable|string',
             'exploracion_piel' => 'nullable|string',
             'resultados_laboratorio' => 'nullable|string',
+            'estudios_gabinete' => 'nullable|string',
             'diagnosticos' => 'required|string',
             'tratamiento' => 'required|string',
             'pronostico' => 'nullable|string'
@@ -126,6 +127,7 @@ class ExpedientesController extends Controller
         $expediente = ExpedienteClinico::findOrFail($id);
         
         $validator = Validator::make($request->all(), [
+            'id_paciente' => 'required|exists:pacientes,id',
             'tipo_interrogatorio' => 'required|string|max:255',
             'nombre_paciente' => 'required|string|max:255',
             'edad' => 'required|integer|min:0|max:150',
@@ -147,7 +149,7 @@ class ExpedientesController extends Controller
             'interrogatorio_gastrointestinal' => 'nullable|string',
             'interrogatorio_genitourinario' => 'nullable|string',
             'interrogatorio_hematolinfatico' => 'nullable|string',
-            'interrogatorio_nervioso' => 'nullable|string',
+            'interrogatorio_nervoso' => 'nullable|string',
             'interrogatorio_musculo_esqueletico' => 'nullable|string',
             'interrogatorio_piel_mucosas' => 'nullable|string',
             'signos_ta' => 'nullable|string|max:10',
@@ -165,6 +167,7 @@ class ExpedientesController extends Controller
             'exploracion_extremidades' => 'nullable|string',
             'exploracion_piel' => 'nullable|string',
             'resultados_laboratorio' => 'nullable|string',
+            'estudios_gabinete' => 'nullable|string',
             'diagnosticos' => 'required|string',
             'tratamiento' => 'required|string',
             'pronostico' => 'nullable|string'
@@ -224,9 +227,7 @@ class ExpedientesController extends Controller
     public function expedientesPaciente($idPaciente)
     {
         $paciente = Paciente::findOrFail($idPaciente);
-        $expedientes = ExpedienteClinico::whereHas('cita', function($query) use ($idPaciente) {
-            $query->where('id_paciente', $idPaciente);
-        })->orderBy('fecha_elaboracion', 'desc')->get();
+        $expedientes = ExpedienteClinico::where('id_paciente', $idPaciente)->orderBy('fecha_elaboracion', 'desc')->get();
         
         return view('expedientes.expedientes-paciente', compact('paciente', 'expedientes'));
     }
@@ -265,9 +266,7 @@ class ExpedientesController extends Controller
             $paciente = Paciente::findOrFail($id);
             
             // Verificar si tiene expedientes
-            $tieneExpedientes = ExpedienteClinico::whereHas('cita', function($query) use ($id) {
-                $query->where('id_paciente', $id);
-            })->exists();
+            $tieneExpedientes = ExpedienteClinico::where('id_paciente', $id)->exists();
 
             if ($tieneExpedientes) {
                 return response()->json(['success' => false, 'message' => 'No se puede eliminar el paciente porque tiene expedientes asociados'], 400);

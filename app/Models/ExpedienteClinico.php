@@ -12,6 +12,7 @@ class ExpedienteClinico extends Model
     public $timestamps = false;
     
     protected $fillable = [
+        'id_paciente',
         'id_cita',
         'fecha_elaboracion',
         'hora_elaboracion',
@@ -54,6 +55,7 @@ class ExpedienteClinico extends Model
         'exploracion_extremidades',
         'exploracion_piel',
         'resultados_laboratorio',
+        'estudios_gabinete',
         'diagnosticos',
         'tratamiento',
         'pronostico'

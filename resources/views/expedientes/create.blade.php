@@ -3,12 +3,12 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Crear Nuevo Expediente Clínico</h4>
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-4 mt-4 mb-4">
+                <div class="card-header bg-gradient-primary text-white rounded-top-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h4 class="mb-0"><i class="fas fa-file-medical"></i> Crear Nuevo Expediente Clínico</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     @if($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <ul class="mb-0">
@@ -20,7 +20,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('expedientes.store') }}" id="expedienteForm">
+                    <form method="POST" action="{{ route('expedientes.store') }}">
                         @csrf
                         
                         <!-- Eliminado campo de cita, solo se muestran los datos del paciente y expediente -->
@@ -33,12 +33,22 @@
                             </div>
                         </div>
 
-                        @if($paciente)
-                            <div class="alert alert-info">
-                                <i class="fas fa-user"></i> 
-                                <strong>Paciente seleccionado:</strong> {{ $paciente->nombre }} {{ $paciente->apellido_paterno }} {{ $paciente->apellido_materno }}
-                            </div>
+                        @if(isset($paciente))
                             <input type="hidden" name="id_paciente" value="{{ $paciente->id }}">
+                            <div class="mb-3">
+                                <label class="form-label">Paciente</label>
+                                <input type="text" class="form-control" value="{{ $paciente->nombre }} {{ $paciente->apellido_paterno }} {{ $paciente->apellido_materno }}" disabled>
+                            </div>
+                        @else
+                            <div class="mb-3">
+                                <label for="id_paciente" class="form-label">Paciente</label>
+                                <select name="id_paciente" id="id_paciente" class="form-select" required>
+                                    <option value="">Seleccione un paciente</option>
+                                    @foreach(App\Models\Paciente::orderBy('nombre')->get() as $p)
+                                        <option value="{{ $p->id }}" {{ old('id_paciente') == $p->id ? 'selected' : '' }}>{{ $p->nombre }} {{ $p->apellido_paterno }} {{ $p->apellido_materno }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         @endif
 
                         <div class="row mb-3">
@@ -334,6 +344,14 @@
                             <div class="col-md-12">
                                 <label for="resultados_laboratorio" class="form-label">Resultados de Laboratorio</label>
                                 <textarea name="resultados_laboratorio" id="resultados_laboratorio" 
+                                          class="form-control" rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="estudios_gabinete" class="form-label">Estudios de Gabinete</label>
+                                <textarea name="estudios_gabinete" id="estudios_gabinete" 
                                           class="form-control" rows="4"></textarea>
                             </div>
                         </div>

@@ -24,6 +24,15 @@
                         @csrf
                         @method('PUT')
                         
+                        <div class="mb-3">
+                            <label for="id_paciente" class="form-label">Paciente</label>
+                            <select name="id_paciente" id="id_paciente" class="form-select" required>
+                                @foreach(App\Models\Paciente::orderBy('nombre')->get() as $p)
+                                    <option value="{{ $p->id }}" {{ (old('id_paciente', $expediente->id_paciente) == $p->id) ? 'selected' : '' }}>{{ $p->nombre }} {{ $p->apellido_paterno }} {{ $p->apellido_materno }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <!-- Sección de Identificación -->
                         <div class="row mb-4">
                             <div class="col-12">
