@@ -16,6 +16,8 @@ class ExpedienteClinico extends Model
         'id_cita',
         'fecha_elaboracion',
         'hora_elaboracion',
+        'fecha_atencion',
+        'numero_visita',
         'tipo_interrogatorio',
         'nombre_paciente',
         'edad',
@@ -32,6 +34,7 @@ class ExpedienteClinico extends Model
         'desarrollo_psicomotor',
         'antecedentes_personales_patologicos',
         'padecimiento_actual',
+        'padecimientos_adicionales',
         'interrogatorio_cardiovascular',
         'interrogatorio_respiratorio',
         'interrogatorio_gastrointestinal',
@@ -64,7 +67,8 @@ class ExpedienteClinico extends Model
     protected $casts = [
         'fecha_elaboracion' => 'date',
         'hora_elaboracion' => 'datetime:H:i',
-        'edad' => 'integer'
+        'edad' => 'integer',
+        'padecimientos_adicionales' => 'array'
     ];
     
     public function cita()

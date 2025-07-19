@@ -25,12 +25,9 @@
                         @method('PUT')
                         
                         <div class="mb-3">
-                            <label for="id_paciente" class="form-label">Paciente</label>
-                            <select name="id_paciente" id="id_paciente" class="form-select" required>
-                                @foreach(App\Models\Paciente::orderBy('nombre')->get() as $p)
-                                    <option value="{{ $p->id }}" {{ (old('id_paciente', $expediente->id_paciente) == $p->id) ? 'selected' : '' }}>{{ $p->nombre }} {{ $p->apellido_paterno }} {{ $p->apellido_materno }}</option>
-                                @endforeach
-                            </select>
+                            <label class="form-label">Paciente</label>
+                            <input type="text" class="form-control" value="{{ $expediente->paciente ? $expediente->paciente->nombre : '' }}" readonly>
+                            <input type="hidden" name="id_paciente" value="{{ $expediente->id_paciente }}">
                         </div>
 
                         <!-- Sección de Identificación -->
@@ -119,6 +116,13 @@
 
                         <div class="row mb-3">
                             <div class="col-md-4">
+                                <label for="fecha_atencion" class="form-label">Fecha de Atención *</label>
+                                <input type="date" name="fecha_atencion" id="fecha_atencion" class="form-control" required value="{{ old('fecha_atencion', $expediente->fecha_atencion ?? $expediente->fecha_elaboracion ?? date('Y-m-d')) }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
                                 <label for="antecedentes_perinatales" class="form-label">Antecedentes Perinatales</label>
                                 <textarea name="antecedentes_perinatales" id="antecedentes_perinatales" 
                                           class="form-control" rows="3">{{ old('antecedentes_perinatales', $expediente->antecedentes_perinatales) }}</textarea>
@@ -156,7 +160,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-12">
+                            <div class="col-md-8">
                                 <label for="padecimiento_actual" class="form-label">Padecimiento Actual *</label>
                                 <div class="input-group mb-2">
                                     <textarea name="padecimiento_actual" id="padecimiento_actual" 
@@ -164,7 +168,53 @@
                                     <button type="button" class="btn btn-outline-danger" onclick="document.getElementById('padecimiento_actual').value = ''">Limpiar</button>
                                 </div>
                                 <small class="text-muted">Puedes limpiar y volver a llenar este campo para cada consulta subsecuente.</small>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarPadecimiento()">
+                                        <i class="fas fa-plus"></i> Agregar Otro Padecimiento
+                                    </button>
+                                </div>
                             </div>
+                            <div class="col-md-4">
+                                <label for="numero_visita" class="form-label">Número de Visita</label>
+                                @php
+                                    // Contar cuántas veces se ha agregado padecimiento actual (basado en el historial)
+                                    $padecimientosAnteriores = \App\Models\ExpedienteClinico::where('id_paciente', $expediente->id_paciente)
+                                        ->where('id', '<=', $expediente->id)
+                                        ->whereNotNull('padecimiento_actual')
+                                        ->where('padecimiento_actual', '!=', '')
+                                        ->count();
+                                    $numeroVisita = $padecimientosAnteriores;
+                                @endphp
+                                <input type="number" name="numero_visita" id="numero_visita" 
+                                       class="form-control" min="1" value="{{ old('numero_visita', $numeroVisita) }}" readonly>
+                                <small class="text-muted">Basado en padecimientos agregados</small>
+                            </div>
+                        </div>
+
+                        <!-- Campos adicionales de padecimiento (se agregan dinámicamente) -->
+                        <div id="padecimientos-adicionales">
+                            <!-- Aquí se agregarán campos adicionales dinámicamente -->
+                            @if($expediente->padecimientos_adicionales && count($expediente->padecimientos_adicionales) > 0)
+                                @foreach($expediente->padecimientos_adicionales as $index => $padecimiento)
+                                    <div class="row mb-3 padecimiento-adicional">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Padecimiento Adicional {{ $index + 1 }}</label>
+                                            <div class="input-group">
+                                                <textarea name="padecimiento_adicional_{{ $index + 1 }}" 
+                                                          class="form-control padecimiento-adicional-text" rows="3" placeholder="Describa el padecimiento adicional...">{{ $padecimiento['descripcion'] }}</textarea>
+                                                <button type="button" class="btn btn-outline-danger" onclick="eliminarPadecimiento(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Número de Visita</label>
+                                            <input type="number" class="form-control" value="{{ $index + 2 }}" readonly>
+                                            <small class="text-muted">Visita adicional</small>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
 
                         <!-- Sección de Interrogatorio por Sistemas -->
@@ -474,4 +524,96 @@
         border-radius: 0.75rem;
     }
 </style>
+
+<script>
+let contadorPadecimientos = {{ $expediente->padecimientos_adicionales ? count($expediente->padecimientos_adicionales) : 0 }};
+
+function agregarPadecimiento() {
+    contadorPadecimientos++;
+    const container = document.getElementById('padecimientos-adicionales');
+    
+    const nuevoPadecimiento = document.createElement('div');
+    nuevoPadecimiento.className = 'row mb-3 padecimiento-adicional';
+    nuevoPadecimiento.innerHTML = `
+        <div class="col-md-8">
+            <label class="form-label">Padecimiento Adicional ${contadorPadecimientos}</label>
+            <div class="input-group">
+                <textarea name="padecimiento_adicional_${contadorPadecimientos}" 
+                          class="form-control padecimiento-adicional-text" rows="3" placeholder="Describa el padecimiento adicional..."></textarea>
+                <button type="button" class="btn btn-outline-danger" onclick="eliminarPadecimiento(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Número de Visita</label>
+            <input type="number" class="form-control" value="${contadorPadecimientos + 1}" readonly>
+            <small class="text-muted">Visita adicional</small>
+        </div>
+    `;
+    
+    container.appendChild(nuevoPadecimiento);
+    actualizarNumeroVisita();
+    actualizarPadecimientosOcultos();
+}
+
+function eliminarPadecimiento(button) {
+    const padecimientoDiv = button.closest('.padecimiento-adicional');
+    padecimientoDiv.remove();
+    actualizarNumeroVisita();
+    actualizarPadecimientosOcultos();
+}
+
+function actualizarNumeroVisita() {
+    const padecimientosAdicionales = document.querySelectorAll('.padecimiento-adicional').length;
+    const numeroVisita = document.getElementById('numero_visita');
+    const padecimientoActual = document.getElementById('padecimiento_actual').value;
+    
+    // Si hay padecimiento actual, cuenta como 1, más los adicionales
+    let total = padecimientosAdicionales;
+    if (padecimientoActual && padecimientoActual.trim() !== '') {
+        total += 1;
+    }
+    
+    numeroVisita.value = total;
+}
+
+function actualizarPadecimientosOcultos() {
+    // Eliminar campo oculto anterior si existe
+    let campoOculto = document.getElementById('padecimientos_adicionales_json');
+    if (campoOculto) {
+        campoOculto.remove();
+    }
+    
+    // Recolectar todos los padecimientos adicionales
+    const padecimientosAdicionales = [];
+    document.querySelectorAll('.padecimiento-adicional-text').forEach((textarea, index) => {
+        if (textarea.value.trim() !== '') {
+            padecimientosAdicionales.push({
+                numero: index + 1,
+                descripcion: textarea.value.trim()
+            });
+        }
+    });
+    
+    // Crear campo oculto con los datos
+    if (padecimientosAdicionales.length > 0) {
+        const inputOculto = document.createElement('input');
+        inputOculto.type = 'hidden';
+        inputOculto.name = 'padecimientos_adicionales_json';
+        inputOculto.id = 'padecimientos_adicionales_json';
+        inputOculto.value = JSON.stringify(padecimientosAdicionales);
+        document.getElementById('expedienteForm').appendChild(inputOculto);
+    }
+}
+
+// Agregar event listeners para actualizar el campo oculto cuando cambien los valores
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('padecimiento-adicional-text')) {
+            actualizarPadecimientosOcultos();
+        }
+    });
+});
+</script>
 @endsection 

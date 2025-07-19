@@ -47,6 +47,8 @@ class ExpedientesController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id_paciente' => 'required|exists:pacientes,id',
+            'fecha_atencion' => 'required|date',
+            'numero_visita' => 'nullable|integer|min:1',
             'tipo_interrogatorio' => 'required|string|max:255',
             'nombre_paciente' => 'required|string|max:255',
             'edad' => 'required|integer|min:0|max:150',
@@ -98,10 +100,28 @@ class ExpedientesController extends Controller
                 ->withInput();
         }
 
+        // Calcular número de visita basado en padecimientos anteriores
+        $padecimientosAnteriores = ExpedienteClinico::where('id_paciente', $request->id_paciente)
+            ->whereNotNull('padecimiento_actual')
+            ->where('padecimiento_actual', '!=', '')
+            ->count();
+        $numeroVisita = $padecimientosAnteriores + 1;
+
+        // Procesar padecimientos adicionales
+        $padecimientosAdicionales = [];
+        if ($request->has('padecimientos_adicionales_json')) {
+            $padecimientosAdicionales = json_decode($request->padecimientos_adicionales_json, true) ?? [];
+        }
+
         // Guardar expediente sin crear cita
         $expediente = new ExpedienteClinico($request->all());
         $expediente->fecha_elaboracion = \Carbon\Carbon::now()->toDateString();
         $expediente->hora_elaboracion = \Carbon\Carbon::now()->toTimeString();
+        $expediente->numero_visita = $numeroVisita;
+        $expediente->padecimientos_adicionales = $padecimientosAdicionales;
+        if (!$request->filled('fecha_atencion')) {
+            $expediente->fecha_atencion = \Carbon\Carbon::now()->toDateString();
+        }
         $expediente->save();
 
         return redirect()->route('expedientes.index')
@@ -128,6 +148,8 @@ class ExpedientesController extends Controller
         
         $validator = Validator::make($request->all(), [
             'id_paciente' => 'required|exists:pacientes,id',
+            'fecha_atencion' => 'required|date',
+            'numero_visita' => 'nullable|integer|min:1',
             'tipo_interrogatorio' => 'required|string|max:255',
             'nombre_paciente' => 'required|string|max:255',
             'edad' => 'required|integer|min:0|max:150',
@@ -179,7 +201,27 @@ class ExpedientesController extends Controller
                 ->withInput();
         }
 
+        // Recalcular número de visita basado en padecimientos anteriores
+        $padecimientosAnteriores = ExpedienteClinico::where('id_paciente', $request->id_paciente)
+            ->where('id', '<=', $expediente->id)
+            ->whereNotNull('padecimiento_actual')
+            ->where('padecimiento_actual', '!=', '')
+            ->count();
+        $numeroVisita = $padecimientosAnteriores;
+
+        // Procesar padecimientos adicionales
+        $padecimientosAdicionales = [];
+        if ($request->has('padecimientos_adicionales_json')) {
+            $padecimientosAdicionales = json_decode($request->padecimientos_adicionales_json, true) ?? [];
+        }
+
         $expediente->update($request->all());
+        $expediente->numero_visita = $numeroVisita;
+        $expediente->padecimientos_adicionales = $padecimientosAdicionales;
+        if (!$request->filled('fecha_atencion')) {
+            $expediente->fecha_atencion = \Carbon\Carbon::now()->toDateString();
+        }
+        $expediente->save();
 
         return redirect()->route('expedientes.index')
             ->with('success', 'Expediente clínico actualizado exitosamente.');

@@ -143,6 +143,22 @@
                         </div>
                     </div>
 
+                    @if($expediente->padecimientos_adicionales && count($expediente->padecimientos_adicionales) > 0)
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <strong>Padecimientos Adicionales:</strong>
+                                @foreach($expediente->padecimientos_adicionales as $padecimiento)
+                                    <div class="card mt-2 mb-2">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">Padecimiento Adicional #{{ $padecimiento['numero'] }}</h6>
+                                            <p class="card-text">{{ $padecimiento['descripcion'] }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Interrogatorio por Sistemas -->
                     <div class="row mb-4">
                         <div class="col-12">
